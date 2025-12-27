@@ -11,6 +11,7 @@ Shader "Custom/StarPixelCore"
         _BaseColor ("Base Color", Color) = (1,0.7,0.25,1)
         _HotColor ("Hot Color", Color) = (1,0.95,0.7,1)
         _AlphaInside ("Alpha Inside", Range(0,1)) = 1
+        _EllipseScale ("Ellipse Scale (X,Y)", Vector) = (1,1,0,0)
         _RampTex ("Ramp Tex", 2D) = "white" {}
         [Toggle(_USE_RAMPTEX)] _UseRampTex ("Use Ramp Tex", Float) = 0
         _DebugMode ("Debug Mode", Int) = 0
@@ -46,6 +47,7 @@ Shader "Custom/StarPixelCore"
                 float4 _BaseColor;
                 float4 _HotColor;
                 float _AlphaInside;
+                float4 _EllipseScale;
                 int _DebugMode;
             CBUFFER_END
 
@@ -75,7 +77,8 @@ Shader "Custom/StarPixelCore"
             {
                 float2 centered = (uv + _CenterOffset.xy - 0.5) * 2.0;
                 float aspect = _ScreenParams.x / _ScreenParams.y;
-                centered.x *= aspect;
+                centered.x *= aspect * _EllipseScale.x;
+                centered.y *= _EllipseScale.y;
                 return centered;
             }
 
