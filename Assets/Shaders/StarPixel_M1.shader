@@ -171,7 +171,7 @@ Shader "Unlit/StarPixel_M1"
                 }
 
                 // === BASE LIGHTING (LIMB DARKENING + CORE) ===
-                float nd = saturate(r / max(_Radius, 1e-5));
+                float nd = saturate(r / _Radius);
                 float limb = pow(1.0 - nd, _LimbDarkeningPower);
                 float core = pow(1.0 - nd, _CorePower) * _CoreIntensity;
                 float baseLight = saturate((limb + core) * _Brightness);
