@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: StarPixel_M2
+  m_Shader: {fileID: 4800000, guid: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3000
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties:
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AlphaInside: 1
+    - _BandColorStrength: 0.2
+    - _BandEnabled: 1
+    - _BandIntensity: 0.6
+    - _BandJaggedness: 0.6
+    - _BandNoiseScale: 48
+    - _BandOffset: 0
+    - _BandSoftness: 0.05
+    - _BandWidth: 0.25
+    - _Brightness: 1
+    - _CoreIntensity: 0.4
+    - _CorePower: 6
+    - _DebugMode: 0
+    - _EdgeSoftness: 0
+    - _LimbDarkeningPower: 2
+    - _PaletteSteps: 6
+    - _PixelSize: 6
+    - _Radius: 0.65
+    - _SpotColorStrength: 0.4
+    - _SpotEnabled: 1
+    - _SpotIntensity: 0.5
+    - _SpotScale: 48
+    - _SpotSoftness: 0.08
+    - _SpotThreshold: 0.55
+    - _SurfaceContrast: 2
+    - _SurfaceScale: 64
+    - _SurfaceStrength: 0.7
+    - _TimeScale: 1
+    - _Activity: 1
+    - _DifferentialMin: 0.7
+    - _DifferentialPower: 2
+    - _SurfaceAngularSpeed: 0.25
+    - _BandAngularSpeed: 0.15
+    - _SpotsAngularSpeed: 0.10
+    - _SurfaceScrollX: 0.10
+    - _SurfaceScrollY: 0.02
+    - _SurfaceEvolve: 0.25
+    - _BandWobbleAmp: 0
+    - _BandWobbleSpeed: 0.6
+    - _BandWobbleSpatial: 2
+    - _SpotsEvolve: 0.15
+    - _SpotsEvolveX: 0.03
+    - _SpotsEvolveY: 0.01
+    m_Colors:
+    - _BandColor: {r: 1, g: 0.8, b: 0.4, a: 1}
+    - _BaseColor: {r: 0.8, g: 0.2, b: 0.1, a: 1}
+    - _CenterOffset: {r: 0, g: 0, b: 0, a: 0}
+    - _HotColor: {r: 1, g: 0.95, b: 0.8, a: 1}
+    - _SpotColor: {r: 0.3, g: 0.1, b: 0.05, a: 1}
+  m_BuildTextureStacks: []
