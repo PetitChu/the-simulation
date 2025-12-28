@@ -132,6 +132,9 @@ Shader "Unlit/StarPixel_M1"
             // Simple 2D hash function for deterministic noise
             float hash21(float2 p)
             {
+                // These arbitrary-looking constants are empirically chosen to decorrelate
+                // nearby inputs and produce stable pseudo-random noise suitable for shaders.
+                // Changing them will change the noise pattern (hash distribution).
                 p = frac(p * float2(234.34, 435.345));
                 p += dot(p, p + 34.23);
                 return frac(p.x * p.y);
