@@ -77,7 +77,7 @@ Shader "Unlit/StarPixel_M2"
         _SpotsEvolveY("Spots Evolve Y", Float) = 0.01
 
         // Debug
-        [KeywordEnum(Final, DiscMask, Light, SurfaceNoise, BandMask, SpotsMask, Theta)] _DebugMode("Debug Mode", Float) = 0
+        [KeywordEnum(Final, DiscMask, Light, SurfaceNoise, BandMask, SpotsMask, DiffFactor)] _DebugMode("Debug Mode", Float) = 0
     }
 
     SubShader
@@ -100,7 +100,7 @@ Shader "Unlit/StarPixel_M2"
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #pragma multi_compile _DEBUGMODE_FINAL _DEBUGMODE_DISCMASK _DEBUGMODE_LIGHT _DEBUGMODE_SURFACENOISE _DEBUGMODE_BANDMASK _DEBUGMODE_SPOTSMASK _DEBUGMODE_THETA
+            #pragma multi_compile _DEBUGMODE_FINAL _DEBUGMODE_DISCMASK _DEBUGMODE_LIGHT _DEBUGMODE_SURFACENOISE _DEBUGMODE_BANDMASK _DEBUGMODE_SPOTSMASK _DEBUGMODE_DIFFFACTOR
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
@@ -227,12 +227,12 @@ Shader "Unlit/StarPixel_M2"
                     return float4(0, 0, 0, 0);
                 }
 
-                // === POLAR COORDINATES & DIFFERENTIAL ROTATION ===
-                float nr = saturate(r / _Radius);
+                // === LATITUDE & DIFFERENTIAL ROTATION ===
+                // Pole at top/bottom (Y-axis), rotation around vertical axis
+                // Latitude from vertical position (0 at equator/center, ±1 at poles)
                 float lat = p.y / _Radius;
-                float theta = atan2(p.y, p.x); // [-PI, PI]
 
-                // Compute differential rotation factor
+                // Compute differential rotation factor (equator fast, poles slow)
                 float diffFactor = getDifferentialFactor(lat);
 
                 // Global time
@@ -244,13 +244,13 @@ Shader "Unlit/StarPixel_M2"
                 float core = pow(1.0 - nd, _CorePower) * _CoreIntensity;
                 float baseLight = saturate((limb + core) * _Brightness);
 
-                // === SURFACE LAYER WITH ADVECTION + EVOLUTION ===
-                // Compute rotated theta for surface
-                float thetaSurface = theta + t * _SurfaceAngularSpeed * diffFactor;
+                // === SURFACE LAYER WITH HORIZONTAL ADVECTION + EVOLUTION ===
+                // Horizontal shift based on angular speed and differential rotation
+                float surfaceShift = t * _SurfaceAngularSpeed * diffFactor;
 
-                // Reconstruct sampling position from rotated theta
-                float2 pSurface = float2(cos(thetaSurface), sin(thetaSurface)) * r;
-                float2 uvSurface = pSurface * 0.5 + 0.5; // Convert to 0-1 range
+                // Apply horizontal shift to UV (wrapping via frac for seamless tiling)
+                float2 uvSurface = uvQ;
+                uvSurface.x += surfaceShift;
 
                 // Apply evolution drift in cell space
                 float2 cellCoord = uvSurface * _SurfaceScale;
@@ -271,19 +271,19 @@ Shader "Unlit/StarPixel_M2"
                 float surfMix = lerp(1.0, surf, _SurfaceStrength);
                 float light = baseLight * surfMix;
 
-                // === EQUATORIAL BAND LAYER WITH ADVECTION + WOBBLE ===
-                // Compute rotated theta for band
-                float thetaBand = theta + t * _BandAngularSpeed * diffFactor;
+                // === EQUATORIAL BAND LAYER WITH HORIZONTAL ADVECTION + WOBBLE ===
+                // Horizontal shift for band
+                float bandShift = t * _BandAngularSpeed * diffFactor;
 
-                // Optional latitude wobble
-                float latBand = lat + sin(t * _BandWobbleSpeed + thetaBand * _BandWobbleSpatial) * _BandWobbleAmp * _Activity;
+                // Optional latitude wobble (using horizontal position for spatial variation)
+                float latBand = lat + sin(t * _BandWobbleSpeed + uvQ.x * _BandWobbleSpatial) * _BandWobbleAmp * _Activity;
 
                 // Band core based on (potentially wobbled) latitude
                 float bandCore = 1.0 - smoothstep(_BandWidth, _BandWidth + _BandSoftness, abs(latBand - _BandOffset));
 
-                // Band jaggedness noise - sample using rotated coordinates
-                float2 pBand = float2(cos(thetaBand), sin(thetaBand)) * r;
-                float2 uvBand = pBand * 0.5 + 0.5;
+                // Band jaggedness noise - sample using shifted coordinates
+                float2 uvBand = uvQ;
+                uvBand.x += bandShift;
                 float2 bandCellId = floor(uvBand * _BandNoiseScale);
                 float bandNoise = hash21(bandCellId);
                 float band = saturate(bandCore + (bandNoise - 0.5) * _BandJaggedness);
@@ -292,13 +292,12 @@ Shader "Unlit/StarPixel_M2"
                 // Apply band as brightness boost
                 float lightBand = light + band * _BandIntensity;
 
-                // === DARK SPOTS LAYER WITH ADVECTION + EVOLUTION ===
-                // Compute rotated theta for spots
-                float thetaSpots = theta + t * _SpotsAngularSpeed * diffFactor;
+                // === DARK SPOTS LAYER WITH HORIZONTAL ADVECTION + EVOLUTION ===
+                // Horizontal shift for spots
+                float spotsShift = t * _SpotsAngularSpeed * diffFactor;
 
-                // Reconstruct sampling position
-                float2 pSpots = float2(cos(thetaSpots), sin(thetaSpots)) * r;
-                float2 uvSpots = pSpots * 0.5 + 0.5;
+                float2 uvSpots = uvQ;
+                uvSpots.x += spotsShift;
 
                 // Apply evolution drift (slower than surface)
                 float2 spotCellCoord = uvSpots * _SpotScale;
@@ -340,9 +339,9 @@ Shader "Unlit/StarPixel_M2"
                     return float4(band, band, band, 1.0);
                 #elif defined(_DEBUGMODE_SPOTSMASK)
                     return float4(spots, spots, spots, 1.0);
-                #elif defined(_DEBUGMODE_THETA)
-                    float thetaNorm = (theta + 3.14159265) / (2.0 * 3.14159265); // Normalize to 0-1
-                    return float4(thetaNorm, thetaNorm, thetaNorm, 1.0);
+                #elif defined(_DEBUGMODE_DIFFFACTOR)
+                    // Show differential rotation factor (equator bright, poles dark)
+                    return float4(diffFactor, diffFactor, diffFactor, 1.0);
                 #endif
 
                 // === FINAL OUTPUT ===
