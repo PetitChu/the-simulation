@@ -208,8 +208,8 @@ Shader "Unlit/StarPixel_M1"
 
                 // === DARK SPOTS LAYER ===
                 float2 spotCellId = floor(uvQ * _SpotScale);
-                float sN = hash21(spotCellId);
-                float spots = smoothstep(_SpotThreshold, _SpotThreshold + _SpotSoftness, sN);
+                float spotNoise = hash21(spotCellId);
+                float spots = smoothstep(_SpotThreshold, _SpotThreshold + _SpotSoftness, spotNoise);
                 spots = 1.0 - spots; // Invert so threshold gives dark blobs
                 spots *= _SpotEnabled;
 
