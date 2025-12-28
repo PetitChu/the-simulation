@@ -186,8 +186,8 @@ Shader "Unlit/StarPixel_M1"
 
                 // Second octave for more variation
                 float2 cellId1 = floor(uvQ * (_SurfaceScale * 0.5));
-                float n1 = hash21(cellId1);
-                float n = lerp(n0, n1, 0.35);
+                float secondOctaveNoise = hash21(cellId1);
+                float n = lerp(n0, secondOctaveNoise, 0.35);
 
                 float surf = pow(n, _SurfaceContrast);
                 float surfMix = lerp(1.0, surf, _SurfaceStrength);
