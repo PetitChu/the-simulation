@@ -199,8 +199,8 @@ Shader "Unlit/StarPixel_M1"
 
                 // Band jaggedness noise
                 float2 bandCellId = floor(uvQ * _BandNoiseScale);
-                float bN = hash21(bandCellId);
-                float band = saturate(bandCore + (bN - 0.5) * _BandJaggedness);
+                float bandNoise = hash21(bandCellId);
+                float band = saturate(bandCore + (bandNoise - 0.5) * _BandJaggedness);
                 band *= _BandEnabled;
 
                 // Apply band as brightness boost
