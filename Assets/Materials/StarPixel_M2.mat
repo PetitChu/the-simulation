@@ -61,21 +61,21 @@ Material:
     - _SurfaceScale: 64
     - _SurfaceStrength: 0.7
     - _TimeScale: 1
-    - _Activity: 1
+    - _Activity: 0.8
     - _DifferentialMin: 0.7
     - _DifferentialPower: 2
-    - _SurfaceAngularSpeed: 0.25
-    - _BandAngularSpeed: 0.15
-    - _SpotsAngularSpeed: 0.10
-    - _SurfaceScrollX: 0.10
-    - _SurfaceScrollY: 0.02
-    - _SurfaceEvolve: 0.25
+    - _SurfaceAngularSpeed: 0.02
+    - _BandAngularSpeed: 0.015
+    - _SpotsAngularSpeed: 0.01
+    - _SurfaceScrollX: 0.003
+    - _SurfaceScrollY: 0.001
+    - _SurfaceEvolve: 0.15
     - _BandWobbleAmp: 0
     - _BandWobbleSpeed: 0.6
     - _BandWobbleSpatial: 2
-    - _SpotsEvolve: 0.15
-    - _SpotsEvolveX: 0.03
-    - _SpotsEvolveY: 0.01
+    - _SpotsEvolve: 0.1
+    - _SpotsEvolveX: 0.002
+    - _SpotsEvolveY: 0.001
     m_Colors:
     - _BandColor: {r: 1, g: 0.8, b: 0.4, a: 1}
     - _BaseColor: {r: 0.8, g: 0.2, b: 0.1, a: 1}

@@ -56,15 +56,15 @@ Shader "Unlit/StarPixel_M2"
         _DifferentialMin("Differential Min (pole speed)", Range(0.0, 1.0)) = 0.7
         _DifferentialPower("Differential Power", Range(1.0, 4.0)) = 2.0
 
-        // Layer Drift Speeds (radians/time feel)
-        _SurfaceAngularSpeed("Surface Angular Speed", Float) = 0.25
-        _BandAngularSpeed("Band Angular Speed", Float) = 0.15
-        _SpotsAngularSpeed("Spots Angular Speed", Float) = 0.10
+        // Layer Drift Speeds (UV units per second, scaled by differential rotation)
+        _SurfaceAngularSpeed("Surface Angular Speed", Float) = 0.02
+        _BandAngularSpeed("Band Angular Speed", Float) = 0.015
+        _SpotsAngularSpeed("Spots Angular Speed", Float) = 0.01
 
         // Surface Evolution
-        _SurfaceScrollX("Surface Scroll X", Float) = 0.10
-        _SurfaceScrollY("Surface Scroll Y", Float) = 0.02
-        _SurfaceEvolve("Surface Evolve", Range(0.0, 1.0)) = 0.25
+        _SurfaceScrollX("Surface Scroll X", Float) = 0.003
+        _SurfaceScrollY("Surface Scroll Y", Float) = 0.001
+        _SurfaceEvolve("Surface Evolve", Range(0.0, 1.0)) = 0.15
 
         // Band Wobble (optional, defaults off)
         _BandWobbleAmp("Band Wobble Amplitude", Range(0.0, 0.1)) = 0.0
@@ -72,9 +72,9 @@ Shader "Unlit/StarPixel_M2"
         _BandWobbleSpatial("Band Wobble Spatial Freq", Float) = 2.0
 
         // Spots Evolution
-        _SpotsEvolve("Spots Evolve", Range(0.0, 1.0)) = 0.15
-        _SpotsEvolveX("Spots Evolve X", Float) = 0.03
-        _SpotsEvolveY("Spots Evolve Y", Float) = 0.01
+        _SpotsEvolve("Spots Evolve", Range(0.0, 1.0)) = 0.1
+        _SpotsEvolveX("Spots Evolve X", Float) = 0.002
+        _SpotsEvolveY("Spots Evolve Y", Float) = 0.001
 
         // Debug
         [KeywordEnum(Final, DiscMask, Light, SurfaceNoise, BandMask, SpotsMask, DiffFactor)] _DebugMode("Debug Mode", Float) = 0
@@ -248,13 +248,14 @@ Shader "Unlit/StarPixel_M2"
                 // Horizontal shift based on angular speed and differential rotation
                 float surfaceShift = t * _SurfaceAngularSpeed * diffFactor;
 
-                // Apply horizontal shift to UV (wrapping via frac for seamless tiling)
+                // Apply horizontal shift to UV with proper wrapping
                 float2 uvSurface = uvQ;
-                uvSurface.x += surfaceShift;
+                uvSurface.x = frac(uvSurface.x + surfaceShift);
 
-                // Apply evolution drift in cell space
+                // Apply evolution drift in cell space (very subtle)
                 float2 cellCoord = uvSurface * _SurfaceScale;
-                cellCoord += float2(t * _SurfaceScrollX, t * _SurfaceScrollY) * _Activity * _SurfaceEvolve;
+                float2 evolutionOffset = float2(t * _SurfaceScrollX, t * _SurfaceScrollY) * _Activity * _SurfaceEvolve;
+                cellCoord += evolutionOffset;
 
                 float2 cellId = floor(cellCoord);
                 float n0 = hash21(cellId);
@@ -262,7 +263,7 @@ Shader "Unlit/StarPixel_M2"
                 // Second octave for more variation
                 const float SURFACE_SECOND_OCTAVE_SCALE = 0.5;
                 float2 cellCoord1 = uvSurface * (_SurfaceScale * SURFACE_SECOND_OCTAVE_SCALE);
-                cellCoord1 += float2(t * _SurfaceScrollX, t * _SurfaceScrollY) * _Activity * _SurfaceEvolve * 0.5;
+                cellCoord1 += evolutionOffset * 0.5;
                 float2 cellId1 = floor(cellCoord1);
                 float secondOctaveNoise = hash21(cellId1);
                 float n = lerp(n0, secondOctaveNoise, 0.35);
@@ -281,9 +282,9 @@ Shader "Unlit/StarPixel_M2"
                 // Band core based on (potentially wobbled) latitude
                 float bandCore = 1.0 - smoothstep(_BandWidth, _BandWidth + _BandSoftness, abs(latBand - _BandOffset));
 
-                // Band jaggedness noise - sample using shifted coordinates
+                // Band jaggedness noise - sample using shifted coordinates with wrapping
                 float2 uvBand = uvQ;
-                uvBand.x += bandShift;
+                uvBand.x = frac(uvBand.x + bandShift);
                 float2 bandCellId = floor(uvBand * _BandNoiseScale);
                 float bandNoise = hash21(bandCellId);
                 float band = saturate(bandCore + (bandNoise - 0.5) * _BandJaggedness);
@@ -297,11 +298,12 @@ Shader "Unlit/StarPixel_M2"
                 float spotsShift = t * _SpotsAngularSpeed * diffFactor;
 
                 float2 uvSpots = uvQ;
-                uvSpots.x += spotsShift;
+                uvSpots.x = frac(uvSpots.x + spotsShift);
 
                 // Apply evolution drift (slower than surface)
                 float2 spotCellCoord = uvSpots * _SpotScale;
-                spotCellCoord += float2(t * _SpotsEvolveX, t * _SpotsEvolveY) * _SpotsEvolve * _Activity;
+                float2 spotEvolution = float2(t * _SpotsEvolveX, t * _SpotsEvolveY) * _SpotsEvolve * _Activity;
+                spotCellCoord += spotEvolution;
 
                 float2 spotCellId = floor(spotCellCoord);
                 float spotNoise = hash21(spotCellId);
