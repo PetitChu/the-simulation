@@ -161,10 +161,10 @@ Shader "Unlit/StarPixel_M1"
                 // === CENTERED STAR COORDINATES ===
                 // Convert quantized UVs to centered coordinates (-1 to 1)
                 // Star will be circular in UV space (circular on the quad itself)
-                float2 p = (uvQ * 2.0 - 1.0);
+                float2 centeredUV = (uvQ * 2.0 - 1.0);
 
                 // === DISC MASK ===
-                float r = length(p);
+                float r = length(centeredUV);
                 float discMask = 1.0 - smoothstep(_Radius, _Radius + _EdgeSoftness, r);
 
                 // Early out if outside disc
