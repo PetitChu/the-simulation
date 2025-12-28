@@ -155,10 +155,10 @@ Shader "Unlit/StarPixel_M1"
                 float2 delta = screenUVq - screenUV;
                 float2 uvQ = IN.uv + _CenterOffset.xy + delta;
 
-                // === ASPECT-CORRECT CENTERED STAR COORDINATES ===
+                // === CENTERED STAR COORDINATES ===
+                // Convert quantized UVs to centered coordinates (-1 to 1)
+                // Star will be circular in UV space (circular on the quad itself)
                 float2 p = (uvQ * 2.0 - 1.0);
-                float aspectRatio = _ScreenParams.x / _ScreenParams.y;
-                p.x *= aspectRatio;
 
                 // === DISC MASK ===
                 float r = length(p);
