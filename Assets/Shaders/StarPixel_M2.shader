@@ -227,12 +227,12 @@ Shader "Unlit/StarPixel_M2"
                     return float4(0, 0, 0, 0);
                 }
 
-                // === LATITUDE & DIFFERENTIAL ROTATION ===
-                // Pole at top/bottom (Y-axis), rotation around vertical axis
-                // Latitude from vertical position (0 at equator/center, ±1 at poles)
+                // === POLAR COORDINATES & DIFFERENTIAL ROTATION ===
+                float nr = saturate(r / _Radius);
                 float lat = p.y / _Radius;
+                float theta = atan2(p.y, p.x);
 
-                // Compute differential rotation factor (equator fast, poles slow)
+                // Compute differential rotation factor
                 float diffFactor = getDifferentialFactor(lat);
 
                 // Global time
@@ -244,18 +244,17 @@ Shader "Unlit/StarPixel_M2"
                 float core = pow(1.0 - nd, _CorePower) * _CoreIntensity;
                 float baseLight = saturate((limb + core) * _Brightness);
 
-                // === SURFACE LAYER WITH HORIZONTAL ADVECTION + EVOLUTION ===
-                // Horizontal shift based on angular speed and differential rotation
-                float surfaceShift = t * _SurfaceAngularSpeed * diffFactor;
+                // === SURFACE LAYER WITH ADVECTION + EVOLUTION ===
+                // Compute rotated theta for surface
+                float thetaSurface = theta + t * _SurfaceAngularSpeed * diffFactor;
 
-                // Apply horizontal shift to UV with proper wrapping
-                float2 uvSurface = uvQ;
-                uvSurface.x = frac(uvSurface.x + surfaceShift);
+                // Reconstruct sampling position from rotated theta
+                float2 pSurface = float2(cos(thetaSurface), sin(thetaSurface)) * r;
+                float2 uvSurface = pSurface * 0.5 + 0.5;
 
-                // Apply evolution drift in cell space (very subtle)
+                // Apply evolution drift in cell space
                 float2 cellCoord = uvSurface * _SurfaceScale;
-                float2 evolutionOffset = float2(t * _SurfaceScrollX, t * _SurfaceScrollY) * _Activity * _SurfaceEvolve;
-                cellCoord += evolutionOffset;
+                cellCoord += float2(t * _SurfaceScrollX, t * _SurfaceScrollY) * _Activity * _SurfaceEvolve;
 
                 float2 cellId = floor(cellCoord);
                 float n0 = hash21(cellId);
@@ -263,7 +262,7 @@ Shader "Unlit/StarPixel_M2"
                 // Second octave for more variation
                 const float SURFACE_SECOND_OCTAVE_SCALE = 0.5;
                 float2 cellCoord1 = uvSurface * (_SurfaceScale * SURFACE_SECOND_OCTAVE_SCALE);
-                cellCoord1 += evolutionOffset * 0.5;
+                cellCoord1 += float2(t * _SurfaceScrollX, t * _SurfaceScrollY) * _Activity * _SurfaceEvolve * 0.5;
                 float2 cellId1 = floor(cellCoord1);
                 float secondOctaveNoise = hash21(cellId1);
                 float n = lerp(n0, secondOctaveNoise, 0.35);
@@ -272,19 +271,19 @@ Shader "Unlit/StarPixel_M2"
                 float surfMix = lerp(1.0, surf, _SurfaceStrength);
                 float light = baseLight * surfMix;
 
-                // === EQUATORIAL BAND LAYER WITH HORIZONTAL ADVECTION + WOBBLE ===
-                // Horizontal shift for band
-                float bandShift = t * _BandAngularSpeed * diffFactor;
+                // === EQUATORIAL BAND LAYER WITH ADVECTION + WOBBLE ===
+                // Compute rotated theta for band
+                float thetaBand = theta + t * _BandAngularSpeed * diffFactor;
 
-                // Optional latitude wobble (using horizontal position for spatial variation)
-                float latBand = lat + sin(t * _BandWobbleSpeed + uvQ.x * _BandWobbleSpatial) * _BandWobbleAmp * _Activity;
+                // Optional latitude wobble
+                float latBand = lat + sin(t * _BandWobbleSpeed + thetaBand * _BandWobbleSpatial) * _BandWobbleAmp * _Activity;
 
                 // Band core based on (potentially wobbled) latitude
                 float bandCore = 1.0 - smoothstep(_BandWidth, _BandWidth + _BandSoftness, abs(latBand - _BandOffset));
 
-                // Band jaggedness noise - sample using shifted coordinates with wrapping
-                float2 uvBand = uvQ;
-                uvBand.x = frac(uvBand.x + bandShift);
+                // Band jaggedness noise - sample using rotated coordinates
+                float2 pBand = float2(cos(thetaBand), sin(thetaBand)) * r;
+                float2 uvBand = pBand * 0.5 + 0.5;
                 float2 bandCellId = floor(uvBand * _BandNoiseScale);
                 float bandNoise = hash21(bandCellId);
                 float band = saturate(bandCore + (bandNoise - 0.5) * _BandJaggedness);
@@ -293,17 +292,17 @@ Shader "Unlit/StarPixel_M2"
                 // Apply band as brightness boost
                 float lightBand = light + band * _BandIntensity;
 
-                // === DARK SPOTS LAYER WITH HORIZONTAL ADVECTION + EVOLUTION ===
-                // Horizontal shift for spots
-                float spotsShift = t * _SpotsAngularSpeed * diffFactor;
+                // === DARK SPOTS LAYER WITH ADVECTION + EVOLUTION ===
+                // Compute rotated theta for spots
+                float thetaSpots = theta + t * _SpotsAngularSpeed * diffFactor;
 
-                float2 uvSpots = uvQ;
-                uvSpots.x = frac(uvSpots.x + spotsShift);
+                // Reconstruct sampling position
+                float2 pSpots = float2(cos(thetaSpots), sin(thetaSpots)) * r;
+                float2 uvSpots = pSpots * 0.5 + 0.5;
 
                 // Apply evolution drift (slower than surface)
                 float2 spotCellCoord = uvSpots * _SpotScale;
-                float2 spotEvolution = float2(t * _SpotsEvolveX, t * _SpotsEvolveY) * _SpotsEvolve * _Activity;
-                spotCellCoord += spotEvolution;
+                spotCellCoord += float2(t * _SpotsEvolveX, t * _SpotsEvolveY) * _SpotsEvolve * _Activity;
 
                 float2 spotCellId = floor(spotCellCoord);
                 float spotNoise = hash21(spotCellId);
