@@ -245,15 +245,16 @@ Shader "Unlit/StarPixel_M2"
                 float baseLight = saturate((limb + core) * _Brightness);
 
                 // === SURFACE LAYER WITH ADVECTION + EVOLUTION ===
-                // Compute rotated theta for surface
-                float thetaSurface = theta + t * _SurfaceAngularSpeed * diffFactor;
+                // Start with screen-quantized UVs (preserves pixel grid)
+                float2 cellCoord = uvQ * _SurfaceScale;
 
-                // Reconstruct sampling position from rotated theta
-                float2 pSurface = float2(cos(thetaSurface), sin(thetaSurface)) * r;
-                float2 uvSurface = pSurface * 0.5 + 0.5;
+                // Rotate in cell-coordinate space using polar rotation
+                float cellTheta = atan2(cellCoord.y - _SurfaceScale * 0.5, cellCoord.x - _SurfaceScale * 0.5);
+                float cellR = length(cellCoord - _SurfaceScale * 0.5);
+                float cellThetaRotated = cellTheta + t * _SurfaceAngularSpeed * diffFactor;
+                cellCoord = float2(cos(cellThetaRotated), sin(cellThetaRotated)) * cellR + _SurfaceScale * 0.5;
 
-                // Apply evolution drift in cell space
-                float2 cellCoord = uvSurface * _SurfaceScale;
+                // Apply evolution drift
                 cellCoord += float2(t * _SurfaceScrollX, t * _SurfaceScrollY) * _Activity * _SurfaceEvolve;
 
                 float2 cellId = floor(cellCoord);
@@ -261,7 +262,11 @@ Shader "Unlit/StarPixel_M2"
 
                 // Second octave for more variation
                 const float SURFACE_SECOND_OCTAVE_SCALE = 0.5;
-                float2 cellCoord1 = uvSurface * (_SurfaceScale * SURFACE_SECOND_OCTAVE_SCALE);
+                float2 cellCoord1 = uvQ * (_SurfaceScale * SURFACE_SECOND_OCTAVE_SCALE);
+                float cellTheta1 = atan2(cellCoord1.y - _SurfaceScale * SURFACE_SECOND_OCTAVE_SCALE * 0.5, cellCoord1.x - _SurfaceScale * SURFACE_SECOND_OCTAVE_SCALE * 0.5);
+                float cellR1 = length(cellCoord1 - _SurfaceScale * SURFACE_SECOND_OCTAVE_SCALE * 0.5);
+                float cellTheta1Rotated = cellTheta1 + t * _SurfaceAngularSpeed * diffFactor;
+                cellCoord1 = float2(cos(cellTheta1Rotated), sin(cellTheta1Rotated)) * cellR1 + _SurfaceScale * SURFACE_SECOND_OCTAVE_SCALE * 0.5;
                 cellCoord1 += float2(t * _SurfaceScrollX, t * _SurfaceScrollY) * _Activity * _SurfaceEvolve * 0.5;
                 float2 cellId1 = floor(cellCoord1);
                 float secondOctaveNoise = hash21(cellId1);
@@ -272,19 +277,19 @@ Shader "Unlit/StarPixel_M2"
                 float light = baseLight * surfMix;
 
                 // === EQUATORIAL BAND LAYER WITH ADVECTION + WOBBLE ===
-                // Compute rotated theta for band
-                float thetaBand = theta + t * _BandAngularSpeed * diffFactor;
-
                 // Optional latitude wobble
-                float latBand = lat + sin(t * _BandWobbleSpeed + thetaBand * _BandWobbleSpatial) * _BandWobbleAmp * _Activity;
+                float latBand = lat + sin(t * _BandWobbleSpeed + theta * _BandWobbleSpatial) * _BandWobbleAmp * _Activity;
 
                 // Band core based on (potentially wobbled) latitude
                 float bandCore = 1.0 - smoothstep(_BandWidth, _BandWidth + _BandSoftness, abs(latBand - _BandOffset));
 
-                // Band jaggedness noise - sample using rotated coordinates
-                float2 pBand = float2(cos(thetaBand), sin(thetaBand)) * r;
-                float2 uvBand = pBand * 0.5 + 0.5;
-                float2 bandCellId = floor(uvBand * _BandNoiseScale);
+                // Band jaggedness noise - rotate in cell space
+                float2 bandCellCoord = uvQ * _BandNoiseScale;
+                float bandCellTheta = atan2(bandCellCoord.y - _BandNoiseScale * 0.5, bandCellCoord.x - _BandNoiseScale * 0.5);
+                float bandCellR = length(bandCellCoord - _BandNoiseScale * 0.5);
+                float bandCellThetaRotated = bandCellTheta + t * _BandAngularSpeed * diffFactor;
+                bandCellCoord = float2(cos(bandCellThetaRotated), sin(bandCellThetaRotated)) * bandCellR + _BandNoiseScale * 0.5;
+                float2 bandCellId = floor(bandCellCoord);
                 float bandNoise = hash21(bandCellId);
                 float band = saturate(bandCore + (bandNoise - 0.5) * _BandJaggedness);
                 band *= _BandEnabled;
@@ -293,15 +298,14 @@ Shader "Unlit/StarPixel_M2"
                 float lightBand = light + band * _BandIntensity;
 
                 // === DARK SPOTS LAYER WITH ADVECTION + EVOLUTION ===
-                // Compute rotated theta for spots
-                float thetaSpots = theta + t * _SpotsAngularSpeed * diffFactor;
+                // Rotate in cell space
+                float2 spotCellCoord = uvQ * _SpotScale;
+                float spotCellTheta = atan2(spotCellCoord.y - _SpotScale * 0.5, spotCellCoord.x - _SpotScale * 0.5);
+                float spotCellR = length(spotCellCoord - _SpotScale * 0.5);
+                float spotCellThetaRotated = spotCellTheta + t * _SpotsAngularSpeed * diffFactor;
+                spotCellCoord = float2(cos(spotCellThetaRotated), sin(spotCellThetaRotated)) * spotCellR + _SpotScale * 0.5;
 
-                // Reconstruct sampling position
-                float2 pSpots = float2(cos(thetaSpots), sin(thetaSpots)) * r;
-                float2 uvSpots = pSpots * 0.5 + 0.5;
-
-                // Apply evolution drift (slower than surface)
-                float2 spotCellCoord = uvSpots * _SpotScale;
+                // Apply evolution drift
                 spotCellCoord += float2(t * _SpotsEvolveX, t * _SpotsEvolveY) * _SpotsEvolve * _Activity;
 
                 float2 spotCellId = floor(spotCellCoord);
