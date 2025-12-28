@@ -184,8 +184,9 @@ Shader "Unlit/StarPixel_M1"
                 float2 cellId = floor(cellCoord);
                 float n0 = hash21(cellId);
 
-                // Second octave for more variation
-                float2 cellId1 = floor(uvQ * (_SurfaceScale * 0.5));
+                // Second octave for more variation: use half the base surface scale
+                const float SURFACE_SECOND_OCTAVE_SCALE = 0.5;
+                float2 cellId1 = floor(uvQ * (_SurfaceScale * SURFACE_SECOND_OCTAVE_SCALE));
                 float secondOctaveNoise = hash21(cellId1);
                 float n = lerp(n0, secondOctaveNoise, 0.35);
 
