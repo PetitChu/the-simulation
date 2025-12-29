@@ -30,13 +30,16 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
         _EvolveX        ("Churn X", Range(-2, 2)) = 0.05
         _EvolveY        ("Churn Y", Range(-2, 2)) = 0.02
 
-        _SpotsEnabled      ("Spots Enabled", Range(0,1)) = 1
-        _SpotScale         ("Spot Detail (relative)", Range(1, 512)) = 28
-        _SpotThreshold     ("Spot Threshold", Range(0,1)) = 0.55
-        _SpotSoftness      ("Spot Softness", Range(0.0, 0.5)) = 0.15
-        _SpotIntensity     ("Spot Intensity", Range(0,1)) = 0.45
-        _SpotTint          ("Spot Tint", Color) = (0.20, 0.02, 0.02, 1)
-        _SpotTintStrength  ("Spot Tint Strength", Range(0,1)) = 0.35
+        _SpotsEnabled       ("Spots Enabled", Range(0,1)) = 1
+        _SpotScale          ("Spot Group Scale (relative)", Range(1, 512)) = 22
+        _SpotDetailScaleMul ("Spot Detail Scale Mult", Range(1, 16)) = 5
+        _SpotDetailStrength ("Spot Detail Strength", Range(0, 1)) = 0.35
+
+        _SpotThreshold      ("Spot Threshold", Range(0,1)) = 0.55
+        _SpotSoftness       ("Spot Softness", Range(0.0, 0.5)) = 0.18
+        _SpotIntensity      ("Spot Intensity", Range(0,1)) = 0.45
+        _SpotTint           ("Spot Tint", Color) = (0.20, 0.02, 0.02, 1)
+        _SpotTintStrength   ("Spot Tint Strength", Range(0,1)) = 0.35
 
         _GlowEnabled   ("Glow Enabled", Range(0,1)) = 1
         _GlowWidthWorld ("Glow Width (world units)", Range(0.0, 10.0)) = 0.10
@@ -46,6 +49,9 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
         _GlowAlpha     ("Glow Alpha", Range(0, 1)) = 0.5
         _GlowEdgeSoftWorld ("Glow Edge Soft (world units)", Range(0.0, 1.0)) = 0.01
         _GlowColor     ("Glow Color", Color) = (0.18, 0.03, 0.03, 1)
+
+        // NEW: how strongly _Brightness drives the glow
+        _GlowBrightnessInfluence ("Glow Brightness Influence", Range(0, 2)) = 0.75
 
         // Debug dropdown:
         [Enum(Final,0, DiscMask,1, SurfaceNoise,2, Spots,3, Glow,4, SpinPin,5)]
@@ -80,16 +86,8 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
             #define TWO_PI 6.28318530718
             #define TIME_WRAP_SECONDS 2048.0
 
-            struct Attributes
-            {
-                float3 positionOS : POSITION;
-            };
-
-            struct Varyings
-            {
-                float4 positionCS : SV_POSITION;
-                float3 positionWS : TEXCOORD0;
-            };
+            struct Attributes { float3 positionOS : POSITION; };
+            struct Varyings   { float4 positionCS : SV_POSITION; float3 positionWS : TEXCOORD0; };
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _CenterOffsetXY;
@@ -121,6 +119,9 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
 
                 float  _SpotsEnabled;
                 float  _SpotScale;
+                float  _SpotDetailScaleMul;
+                float  _SpotDetailStrength;
+
                 float  _SpotThreshold;
                 float  _SpotSoftness;
                 float  _SpotIntensity;
@@ -135,6 +136,7 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
                 float  _GlowAlpha;
                 float  _GlowEdgeSoftWorld;
                 float4 _GlowColor;
+                float  _GlowBrightnessInfluence;
 
                 float  _DebugMode;
                 float  _DebugPinWidth;
@@ -157,6 +159,20 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
                 return lerp(n0, n1, 0.35);
             }
 
+            float valueNoise2D(float2 x)
+            {
+                float2 i = floor(x);
+                float2 f = frac(x);
+
+                float a = hash21(i);
+                float b = hash21(i + float2(1,0));
+                float c = hash21(i + float2(0,1));
+                float d = hash21(i + float2(1,1));
+
+                float2 u = f * f * (3.0 - 2.0 * f);
+                return lerp(lerp(a, b, u.x), lerp(c, d, u.x), u.y);
+            }
+
             float triplanarChunkyNoise(float3 p, float scale, float2 timeOffset)
             {
                 float3 w = abs(p);
@@ -166,6 +182,19 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
                 float nXY = chunkyNoise2D(p.xy * scale + timeOffset);
                 float nYZ = chunkyNoise2D(p.yz * scale + timeOffset);
                 float nZX = chunkyNoise2D(p.zx * scale + timeOffset);
+
+                return nXY * w.z + nYZ * w.x + nZX * w.y;
+            }
+
+            float triplanarValueNoise(float3 p, float scale, float2 timeOffset)
+            {
+                float3 w = abs(p);
+                w = max(w, 1e-5);
+                w /= (w.x + w.y + w.z);
+
+                float nXY = valueNoise2D(p.xy * scale + timeOffset);
+                float nYZ = valueNoise2D(p.yz * scale + timeOffset);
+                float nZX = valueNoise2D(p.zx * scale + timeOffset);
 
                 return nXY * w.z + nYZ * w.x + nZX * w.y;
             }
@@ -218,7 +247,7 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
                 float2 uv = pQ / radius;
                 float rr = dot(uv, uv);
                 float z  = sqrt(max(0.0, 1.0 - rr));
-                float3 n = normalize(float3(uv.x, uv.y, z)); // hemisphere normal
+                float3 n = normalize(float3(uv.x, uv.y, z));
 
                 // Spin axis (star space)
                 float3 axis = _SpinAxis.xyz;
@@ -229,14 +258,15 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
                 float timeSec = _Time.y * _TimeScale;
                 timeSec = timeSec - floor(timeSec / TIME_WRAP_SECONDS) * TIME_WRAP_SECONDS;
 
-                // Simple uniform rotation (no differential)
-                float omega = _RotationRPS * TWO_PI;   // rad/sec
+                // Uniform rotation
+                float omega = _RotationRPS * TWO_PI;
                 float angle = omega * timeSec;
                 float3 nR = rotateAroundAxis(n, axis, angle);
 
-                // Noise sampling
+                // Noise sampling offsets (churn)
                 float2 timeOff = float2(timeSec * _EvolveX, timeSec * _EvolveY) * _EvolveStrength;
 
+                // Surface stays chunky (pixel texture)
                 float nSurf = triplanarChunkyNoise(nR, _SurfaceScale, timeOff);
                 float surf  = pow(max(nSurf, 1e-5), _SurfaceContrast);
                 float surfMix = lerp(1.0, surf, _SurfaceStrength);
@@ -246,11 +276,21 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
                 float light = _Brightness * (1.0 - rim * _RimStrength);
                 light *= surfMix;
 
-                // Spots
+                // Spots: grouped blotches (smooth macro + micro detail)
                 float spotsMask = 0.0;
                 if (_SpotsEnabled > 0.5)
                 {
-                    float sN = triplanarChunkyNoise(nR + float3(0.17, -0.31, 0.09), _SpotScale, timeOff * 0.35);
+                    float3 spotP = nR + float3(0.17, -0.31, 0.09);
+
+                    float macro = triplanarValueNoise(spotP, _SpotScale, timeOff * 0.35);
+                    float micro = triplanarValueNoise(
+                        spotP + float3(0.41, 0.23, -0.19),
+                        _SpotScale * max(_SpotDetailScaleMul, 1.0),
+                        timeOff * 0.15
+                    );
+
+                    float sN = saturate(macro + (micro - 0.5) * _SpotDetailStrength);
+
                     float m = smoothstep(_SpotThreshold, _SpotThreshold + _SpotSoftness, sN);
                     spotsMask = (1.0 - m) * disc;
 
@@ -272,7 +312,7 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
                 float steps = max(2.0, _PaletteSteps);
                 color = floor(color * steps) / steps;
 
-                // Glow
+                // Glow (now influenced by _Brightness)
                 float glow = 0.0;
                 float3 glowRGB = 0;
                 if (_GlowEnabled > 0.5)
@@ -284,22 +324,26 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
                     halo = pow(halo, _GlowPower);
                     halo *= exp(-outside * _GlowFalloff);
 
-                    glow = halo * _GlowIntensity;
+                    // Brightness influence: 1 + influence*(Brightness-1)
+                    float bBoost = 1.0 + _GlowBrightnessInfluence * (_Brightness - 1.0);
+                    bBoost = max(0.0, bBoost);
+
+                    glow = halo * _GlowIntensity * bBoost;
 
                     glowRGB = _GlowColor.rgb * glow;
-                    glowRGB += _GlowColor.rgb * discFull * (0.08 * _GlowIntensity);
+                    glowRGB += _GlowColor.rgb * discFull * (0.08 * _GlowIntensity) * bBoost;
                 }
 
                 // Debug dropdown modes
                 int dm = (int)round(_DebugMode);
-                if (dm == 1) return float4(disc.xxx, 1);          // DiscMask
-                if (dm == 2) return float4(nSurf.xxx, 1);         // SurfaceNoise
-                if (dm == 3) return float4(spotsMask.xxx, 1);     // Spots
-                if (dm == 4) return float4(glow.xxx, 1);          // Glow
+                if (dm == 1) return float4(disc.xxx, 1);
+                if (dm == 2) return float4(nSurf.xxx, 1);
+                if (dm == 3) return float4(spotsMask.xxx, 1);
+                if (dm == 4) return float4(glow.xxx, 1);
 
                 if (dm == 5)
                 {
-                    // ----- Spin Pin Debug (Z-aware) -----
+                    // Spin Pin Debug (Z-aware)
                     float aa = max(px / radius, 0.0015);
 
                     float insideDisc = 1.0 - step(1.0, sqrt(rrF));
@@ -308,7 +352,6 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
                     float2 a2 = axis.xy;
                     float a2Len = length(a2);
 
-                    // Axis points toward camera => show center dot.
                     if (a2Len < 1e-4)
                     {
                         float endR0 = max(_DebugPinEndRadius, 1e-5);
@@ -319,36 +362,31 @@ Shader "Unlit/PixelSun_URP_WorldPlane_Flat_Simple"
 
                     float2 dir = a2 / a2Len;
 
-                    // Poles on the sphere project to +/-axis.xy (shrinks as axis.z grows)
                     float poleLen = a2Len;
                     float2 poleP = dir * poleLen;
                     float2 poleN = -dir * poleLen;
 
-                    // Outer ends extend beyond the sphere along the same 3D axis
                     float extend = max(_DebugPinExtend, 0.0);
                     float outerLen = poleLen * (1.0 + extend);
                     float2 endP = dir * outerLen;
                     float2 endN = -dir * outerLen;
 
-                    // Line metrics
                     float distLine = abs(dir.x * uvF.y - dir.y * uvF.x);
                     float along = dot(uvF, dir);
 
                     float width = max(_DebugPinWidth, 1e-5);
                     float stroke = 1.0 - smoothstep(width, width + aa, distLine);
 
-                    float segOuter = 1.0 - smoothstep(outerLen, outerLen + aa, abs(along)); // whole pin
-                    float segInner = 1.0 - smoothstep(poleLen,  poleLen  + aa, abs(along)); // inside sphere
+                    float segOuter = 1.0 - smoothstep(outerLen, outerLen + aa, abs(along));
+                    float segInner = 1.0 - smoothstep(poleLen,  poleLen  + aa, abs(along));
 
                     float insideMask  = segInner * stroke * _DebugPinInsideStrength;
                     float outsideMask = saturate(segOuter - segInner) * stroke;
 
-                    // End caps
                     float endR = max(_DebugPinEndRadius, 1e-5);
                     float capP = 1.0 - smoothstep(endR, endR + aa, length(uvF - endP));
                     float capN = 1.0 - smoothstep(endR, endR + aa, length(uvF - endN));
 
-                    // Small pole dots
                     float poleR = endR * 0.75;
                     float poleDotP = 1.0 - smoothstep(poleR, poleR + aa, length(uvF - poleP));
                     float poleDotN = 1.0 - smoothstep(poleR, poleR + aa, length(uvF - poleN));
