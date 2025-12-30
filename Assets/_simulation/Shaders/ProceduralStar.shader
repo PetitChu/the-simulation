@@ -380,7 +380,6 @@ Shader "Unlit/ProceduralStar"
 
                 // pole->center factor (symmetric, inverted)
                 float gradT_body   = saturate(1.0 - abs(uv.y));
-                float gradT_smooth = saturate(1.0 - abs(uvF.y));
 
                 float rr = dot(uv, uv);
                 float z  = sqrt(max(0.0, 1.0 - rr));
@@ -493,7 +492,7 @@ Shader "Unlit/ProceduralStar"
 
                     glow = halo * _GlowIntensity * bBoost;
 
-                    float3 glowCol = SampleRamp(gradT_smooth, 2.0);
+                    float3 glowCol = SampleRamp(gradT_body, 2.0);
                     glowRGB = glowCol * glow;
                     glowRGB += glowCol * discFull * (0.08 * _GlowIntensity) * bBoost;
                 }
