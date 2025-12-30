@@ -373,7 +373,15 @@ Shader "Unlit/ProceduralStar"
                 float3 n = safeNormalize(float3(uv.x, uv.y, z));
 
                 float3 axis = _SpinAxis.xyz;
-                axis = (dot(axis,axis) > 1e-8) ? safeNormalize(axis) : float3(0,1,0);
+                float axisLenSq = dot(axis, axis);
+                if (axisLenSq > 1e-8)
+                {
+                    axis = axis / sqrt(axisLenSq);
+                }
+                else
+                {
+                    axis = float3(0, 1, 0);
+                }
 
                 float timeSec = _Time.y * _TimeScale;
                 timeSec = timeSec - floor(timeSec / TIME_WRAP_SECONDS) * TIME_WRAP_SECONDS;
