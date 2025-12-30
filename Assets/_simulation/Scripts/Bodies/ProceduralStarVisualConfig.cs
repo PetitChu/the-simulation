@@ -63,7 +63,6 @@ namespace BrainlessLabs.Simulation
         public float flareRingCount;
         public float flareRingSeed;
         public float flareRingOrbitRPS;
-        public float flareRingOffsetWorld;
         public float flareRingMajorWorld;
         public float flareRingMinorWorld;
         public float flareRingWidthWorld;

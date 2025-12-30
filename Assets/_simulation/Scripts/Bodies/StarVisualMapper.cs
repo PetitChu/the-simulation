@@ -62,7 +62,7 @@ namespace BrainlessLabs.Simulation
             );
 
             // Ring sizes scale with radius (small prominence-like structures)
-            float flareRingOffsetWorld = radiusWorld * 0.12f;
+            // Ring centers are positioned at surface contour (offset = radius)
             float flareRingMajorWorld = radiusWorld * 0.08f;
             float flareRingMinorWorld = radiusWorld * 0.035f;
             float flareRingWidthWorld = Mathf.Clamp(radiusWorld * 0.012f, 0f, 0.2f);
@@ -124,7 +124,6 @@ namespace BrainlessLabs.Simulation
             outCfg.flareRingCount = flareRingCount;
             outCfg.flareRingSeed = flareRingSeed;
             outCfg.flareRingOrbitRPS = flareRingOrbitRPS;
-            outCfg.flareRingOffsetWorld = flareRingOffsetWorld;
             outCfg.flareRingMajorWorld = flareRingMajorWorld;
             outCfg.flareRingMinorWorld = flareRingMinorWorld;
             outCfg.flareRingWidthWorld = flareRingWidthWorld;

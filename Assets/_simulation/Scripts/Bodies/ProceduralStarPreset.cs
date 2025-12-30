@@ -63,7 +63,6 @@ namespace BrainlessLabs.Simulation
         [Range(0, 6)] public float flareRingCount = 1f;
         [Range(0, 1000)] public float flareRingSeed = 13f;
         [Range(-0.5f, 0.5f)] public float flareRingOrbitRPS = 0.04f;
-        [Range(0, 10)] public float flareRingOffsetWorld = 0.22f;
         [Range(0, 10)] public float flareRingMajorWorld = 0.16f;
         [Range(0, 10)] public float flareRingMinorWorld = 0.06f;
         [Range(0, 2)] public float flareRingWidthWorld = 0.02f;

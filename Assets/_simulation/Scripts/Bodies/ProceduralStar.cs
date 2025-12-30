@@ -209,7 +209,6 @@ namespace BrainlessLabs.Simulation
             targetMaterial.SetFloat("_FlareRingCount", cfg.flareRingCount);
             targetMaterial.SetFloat("_FlareRingSeed", cfg.flareRingSeed);
             targetMaterial.SetFloat("_FlareRingOrbitRPS", cfg.flareRingOrbitRPS);
-            targetMaterial.SetFloat("_FlareRingOffsetWorld", cfg.flareRingOffsetWorld);
             targetMaterial.SetFloat("_FlareRingMajorWorld", cfg.flareRingMajorWorld);
             targetMaterial.SetFloat("_FlareRingMinorWorld", cfg.flareRingMinorWorld);
             targetMaterial.SetFloat("_FlareRingWidthWorld", cfg.flareRingWidthWorld);
@@ -268,7 +267,6 @@ namespace BrainlessLabs.Simulation
             targetMaterial.SetFloat("_FlareRingCount", p.flareRingCount);
             targetMaterial.SetFloat("_FlareRingSeed", p.flareRingSeed);
             targetMaterial.SetFloat("_FlareRingOrbitRPS", p.flareRingOrbitRPS);
-            targetMaterial.SetFloat("_FlareRingOffsetWorld", p.flareRingOffsetWorld);
             targetMaterial.SetFloat("_FlareRingMajorWorld", p.flareRingMajorWorld);
             targetMaterial.SetFloat("_FlareRingMinorWorld", p.flareRingMinorWorld);
             targetMaterial.SetFloat("_FlareRingWidthWorld", p.flareRingWidthWorld);

@@ -63,7 +63,6 @@ Shader "Unlit/ProceduralStar"
         _FlareRingSeed ("Ring Seed", Range(0, 1000)) = 13
 
         _FlareRingOrbitRPS ("Ring Orbit Speed (turns/sec)", Range(-0.5, 0.5)) = 0.04
-        _FlareRingOffsetWorld ("Ring Center Offset (world units)", Range(0.0, 10.0)) = 0.22
 
         _FlareRingMajorWorld ("Ring Major Radius (world units)", Range(0.0, 10.0)) = 0.16
         _FlareRingMinorWorld ("Ring Minor Radius (world units)", Range(0.0, 10.0)) = 0.06
@@ -186,7 +185,6 @@ Shader "Unlit/ProceduralStar"
                 float  _FlareRingCount;
                 float  _FlareRingSeed;
                 float  _FlareRingOrbitRPS;
-                float  _FlareRingOffsetWorld;
                 float  _FlareRingMajorWorld;
                 float  _FlareRingMinorWorld;
                 float  _FlareRingWidthWorld;
@@ -508,7 +506,6 @@ Shader "Unlit/ProceduralStar"
 
                     float aBase = max(_FlareRingMajorWorld / radius, 0.0);
                     float bBase = max(_FlareRingMinorWorld / radius, 0.0);
-                    float offBase = max(_FlareRingOffsetWorld / radius, 0.0);
                     float wBase = max(_FlareRingWidthWorld / radius, 0.0);
                     float rimOverlap = max(_FlareRingRimOverlapWorld / radius, 0.0);
 
@@ -573,7 +570,7 @@ Shader "Unlit/ProceduralStar"
 
                         // Scale dimensions with lifecycle (grow/shrink)
                         float sizeScale = life;
-                        float off = offBase * lerp(0.80, 1.20, r1);
+                        float off = 1.0;  // Center at surface contour
                         float a = aBase * lerp(0.80, 1.30, r2) * sizeScale;
                         float b = bBase * lerp(0.80, 1.20, r3) * sizeScale;
                         float w = wBase * 0.5 * sizeScale;
