@@ -618,7 +618,7 @@ Shader "Unlit/ProceduralStar"
                 if (dm == 4) return float4(glow.xxx, 1);
                 if (dm == 6) return float4(flareMask.xxx, 1);
 
-                // SpinPin debug unchanged (omitted for brevity in debug modes)
+                // SpinPin debug visualization (dm == 5)
                 if (dm == 5)
                 {
                     float3 ax = axis;
