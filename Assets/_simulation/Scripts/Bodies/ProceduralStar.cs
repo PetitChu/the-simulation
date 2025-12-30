@@ -181,8 +181,7 @@ namespace BrainlessLabs.Simulation
             targetMaterial.SetFloat("_RimStrength", cfg.rimStrength);
             targetMaterial.SetFloat("_RimStart", cfg.rimStart);
 
-            targetMaterial.SetFloat("_ColorFromNoise", cfg.colorFromNoise);
-            targetMaterial.SetFloat("_PaletteSteps", cfg.paletteSteps);
+            // Note: _ColorFromNoise and _PaletteSteps are art parameters, set manually in material
 
             targetMaterial.SetFloat("_TimeScale", cfg.timeScale);
             targetMaterial.SetFloat("_RotationRPS", cfg.rotationRPS);
