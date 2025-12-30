@@ -75,9 +75,6 @@ namespace BrainlessLabs.Simulation
             // Seed
             int flareRingSeed = s.seed;
 
-            // Orbit - locked to star rotation (not independent orbit)
-            float flareRingOrbitRPS = rotationRps;
-
             // F) Glow scales with brightness and radius
             float glowEnabled = 1f;
             float glowWidthWorld = Mathf.Clamp(radiusWorld * 0.40f, 0f, 10f);
@@ -123,7 +120,6 @@ namespace BrainlessLabs.Simulation
             outCfg.flaresEnabled = flaresEnabled;
             outCfg.flareRingCount = flareRingCount;
             outCfg.flareRingSeed = flareRingSeed;
-            outCfg.flareRingOrbitRPS = flareRingOrbitRPS;
             outCfg.flareRingMajorWorld = flareRingMajorWorld;
             outCfg.flareRingMinorWorld = flareRingMinorWorld;
             outCfg.flareRingWidthWorld = flareRingWidthWorld;

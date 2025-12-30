@@ -58,33 +58,17 @@ namespace BrainlessLabs.Simulation
         public float glowEdgeSoftWorld;
         public float glowBrightnessInfluence;
 
-        // Flares
+        // Flares (10 essential parameters)
         public float flaresEnabled;
         public float flareRingCount;
         public float flareRingSeed;
-        public float flareRingOrbitRPS;
         public float flareRingMajorWorld;
         public float flareRingMinorWorld;
         public float flareRingWidthWorld;
-        public float flareRingTilt;
-        public float flareRingNear;
-        public float flareRingFar;
-        public float flareRingRimOverlapWorld;
         public float flareRingBreakup;
-        public float flareRingBreakupScale;
-        public float flareRingFlickerSpeed;
-        public float flareRingFlickerAmt;
-
-        // Flare lifetime
-        public float flareLifeEnabled;
-        public float flareLifePeriod;
-        public float flareLifeDuty;
-        public float flareLifeFadeFrac;
         public float flareLifeJitter;
         public float flareLifeDutyJitter;
         public float flareIntensity;
-        public float flareAlpha;
-        public float flarePosterizeSteps;
 
         // Gradients (5 ramp rows)
         public Gradient bodyLow;

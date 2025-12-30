@@ -514,7 +514,8 @@ Shader "Unlit/ProceduralStar"
                     float discR = length(uv);
                     float outsideMask = smoothstep(1.0 - rimOverlap, 1.0 + aaN, discR);
 
-                    float orbitAng = (_FlareRingOrbitRPS * TWO_PI) * timeSec;
+                    // Flares orbit locked to star rotation
+                    float orbitAng = (_RotationRPS * TWO_PI) * timeSec;
 
                     float flareBrightBoost = max(0.0, 1.0 + 0.35 * (_Brightness - 1.0));
                     float tilt = saturate(_FlareRingTilt);

@@ -208,7 +208,6 @@ namespace BrainlessLabs.Simulation
             targetMaterial.SetFloat("_FlaresEnabled", cfg.flaresEnabled);
             targetMaterial.SetFloat("_FlareRingCount", cfg.flareRingCount);
             targetMaterial.SetFloat("_FlareRingSeed", cfg.flareRingSeed);
-            targetMaterial.SetFloat("_FlareRingOrbitRPS", cfg.flareRingOrbitRPS);
             targetMaterial.SetFloat("_FlareRingMajorWorld", cfg.flareRingMajorWorld);
             targetMaterial.SetFloat("_FlareRingMinorWorld", cfg.flareRingMinorWorld);
             targetMaterial.SetFloat("_FlareRingWidthWorld", cfg.flareRingWidthWorld);
