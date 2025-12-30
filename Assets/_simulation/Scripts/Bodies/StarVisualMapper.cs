@@ -183,32 +183,32 @@ namespace BrainlessLabs.Simulation
                 // Deep red -> orange
                 float t = t01 / 0.25f;
                 Color deepRed = new Color(0.6f, 0.05f, 0.02f);
-                Color orange = new Color(1.0f, 0.35f, 0.10f);
+                Color orange = new Color(0.9f, 0.35f, 0.10f);
                 c = Color.Lerp(deepRed, orange, t);
             }
             else if (t01 < 0.5f)
             {
-                // Orange -> warm white/yellow
+                // Orange -> warm yellow
                 float t = (t01 - 0.25f) / 0.25f;
-                Color orange = new Color(1.0f, 0.35f, 0.10f);
-                Color warmWhite = new Color(1.0f, 0.95f, 0.75f);
-                c = Color.Lerp(orange, warmWhite, t);
+                Color orange = new Color(0.9f, 0.35f, 0.10f);
+                Color warmYellow = new Color(0.85f, 0.75f, 0.50f);
+                c = Color.Lerp(orange, warmYellow, t);
             }
             else if (t01 < 0.75f)
             {
-                // Warm white -> cool white/blue
+                // Warm yellow -> cool tint
                 float t = (t01 - 0.5f) / 0.25f;
-                Color warmWhite = new Color(1.0f, 0.95f, 0.75f);
-                Color coolWhite = new Color(0.85f, 0.90f, 1.0f);
-                c = Color.Lerp(warmWhite, coolWhite, t);
+                Color warmYellow = new Color(0.85f, 0.75f, 0.50f);
+                Color coolTint = new Color(0.65f, 0.70f, 0.85f);
+                c = Color.Lerp(warmYellow, coolTint, t);
             }
             else
             {
-                // Cool white -> blue
+                // Cool tint -> blue
                 float t = (t01 - 0.75f) / 0.25f;
-                Color coolWhite = new Color(0.85f, 0.90f, 1.0f);
-                Color blue = new Color(0.4f, 0.5f, 1.0f);
-                c = Color.Lerp(coolWhite, blue, t);
+                Color coolTint = new Color(0.65f, 0.70f, 0.85f);
+                Color blue = new Color(0.4f, 0.5f, 0.85f);
+                c = Color.Lerp(coolTint, blue, t);
             }
 
             // Apply chroma (increases saturation)
