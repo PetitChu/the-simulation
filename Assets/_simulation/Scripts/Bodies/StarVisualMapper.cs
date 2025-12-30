@@ -242,15 +242,14 @@ namespace BrainlessLabs.Simulation
         /// </summary>
         private static void BuildGradients(Color baseColor, ProceduralStarVisualConfig cfg)
         {
-            // bodyLow: near-black → dark base → base → near-white tint
-            Color softWhite = new Color(0.95f, 0.95f, 0.95f);
+            // bodyLow: near-black → dark base → base → slightly brighter
             cfg.bodyLow.SetKeys(
                 new GradientColorKey[]
                 {
                     new GradientColorKey(baseColor * 0.05f, 0f),
                     new GradientColorKey(baseColor * 0.3f, 0.33f),
                     new GradientColorKey(baseColor, 0.67f),
-                    new GradientColorKey(Color.Lerp(baseColor, softWhite, 0.3f), 1f)
+                    new GradientColorKey(baseColor * 1.1f, 1f)
                 },
                 new GradientAlphaKey[]
                 {
@@ -259,14 +258,14 @@ namespace BrainlessLabs.Simulation
                 }
             );
 
-            // bodyHigh: darker mid → base → bright base → white-hot tint
+            // bodyHigh: darker mid → base → moderately bright
             cfg.bodyHigh.SetKeys(
                 new GradientColorKey[]
                 {
                     new GradientColorKey(baseColor * 0.4f, 0f),
                     new GradientColorKey(baseColor, 0.33f),
-                    new GradientColorKey(baseColor * 1.5f, 0.67f),
-                    new GradientColorKey(Color.Lerp(baseColor, softWhite, 0.7f), 1f)
+                    new GradientColorKey(baseColor * 1.2f, 0.67f),
+                    new GradientColorKey(baseColor * 1.3f, 1f)
                 },
                 new GradientAlphaKey[]
                 {
@@ -275,16 +274,15 @@ namespace BrainlessLabs.Simulation
                 }
             );
 
-            // glow: dark tint → base tint → bright tint → soft white (avoid pure white)
+            // glow: dark tint → base tint → moderately bright (no white)
             Color glowBase = baseColor * 0.6f;
-            Color glowWhite = new Color(0.85f, 0.85f, 0.85f);
             cfg.glow.SetKeys(
                 new GradientColorKey[]
                 {
                     new GradientColorKey(glowBase * 0.2f, 0f),
                     new GradientColorKey(glowBase, 0.33f),
-                    new GradientColorKey(glowBase * 1.8f, 0.67f),
-                    new GradientColorKey(glowWhite, 1f)
+                    new GradientColorKey(glowBase * 1.3f, 0.67f),
+                    new GradientColorKey(glowBase * 1.4f, 1f)
                 },
                 new GradientAlphaKey[]
                 {
@@ -293,15 +291,14 @@ namespace BrainlessLabs.Simulation
                 }
             );
 
-            // flare: base → bright → very bright → soft white
-            Color flareWhite = new Color(0.92f, 0.92f, 0.92f);
+            // flare: base → bright → brighter (no white)
             cfg.flare.SetKeys(
                 new GradientColorKey[]
                 {
                     new GradientColorKey(baseColor, 0f),
-                    new GradientColorKey(baseColor * 1.5f, 0.33f),
-                    new GradientColorKey(baseColor * 2.5f, 0.67f),
-                    new GradientColorKey(flareWhite, 1f)
+                    new GradientColorKey(baseColor * 1.2f, 0.33f),
+                    new GradientColorKey(baseColor * 1.4f, 0.67f),
+                    new GradientColorKey(baseColor * 1.5f, 1f)
                 },
                 new GradientAlphaKey[]
                 {
