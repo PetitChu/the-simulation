@@ -246,7 +246,7 @@ namespace BrainlessLabs.Simulation
             cfg.bodyLow.SetKeys(
                 new GradientColorKey[]
                 {
-                    new GradientColorKey(baseColor * 0.15f, 0f),
+                    new GradientColorKey(baseColor * 0.10f, 0f),
                     new GradientColorKey(baseColor * 0.4f, 0.33f),
                     new GradientColorKey(baseColor, 0.67f),
                     new GradientColorKey(baseColor * 1.1f, 1f)
@@ -262,7 +262,7 @@ namespace BrainlessLabs.Simulation
             cfg.bodyHigh.SetKeys(
                 new GradientColorKey[]
                 {
-                    new GradientColorKey(baseColor * 0.5f, 0f),
+                    new GradientColorKey(baseColor * 0.3f, 0f),
                     new GradientColorKey(baseColor, 0.33f),
                     new GradientColorKey(baseColor * 1.2f, 0.67f),
                     new GradientColorKey(baseColor * 1.3f, 1f)
