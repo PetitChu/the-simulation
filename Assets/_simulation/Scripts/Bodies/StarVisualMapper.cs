@@ -242,12 +242,12 @@ namespace BrainlessLabs.Simulation
         /// </summary>
         private static void BuildGradients(Color baseColor, ProceduralStarVisualConfig cfg)
         {
-            // bodyLow: near-black → dark base → base → slightly brighter
+            // bodyLow: dark base → base → slightly brighter (avoid pure black)
             cfg.bodyLow.SetKeys(
                 new GradientColorKey[]
                 {
-                    new GradientColorKey(baseColor * 0.05f, 0f),
-                    new GradientColorKey(baseColor * 0.3f, 0.33f),
+                    new GradientColorKey(baseColor * 0.15f, 0f),
+                    new GradientColorKey(baseColor * 0.4f, 0.33f),
                     new GradientColorKey(baseColor, 0.67f),
                     new GradientColorKey(baseColor * 1.1f, 1f)
                 },
@@ -258,11 +258,11 @@ namespace BrainlessLabs.Simulation
                 }
             );
 
-            // bodyHigh: darker mid → base → moderately bright
+            // bodyHigh: mid → base → moderately bright
             cfg.bodyHigh.SetKeys(
                 new GradientColorKey[]
                 {
-                    new GradientColorKey(baseColor * 0.4f, 0f),
+                    new GradientColorKey(baseColor * 0.5f, 0f),
                     new GradientColorKey(baseColor, 0.33f),
                     new GradientColorKey(baseColor * 1.2f, 0.67f),
                     new GradientColorKey(baseColor * 1.3f, 1f)
@@ -274,12 +274,12 @@ namespace BrainlessLabs.Simulation
                 }
             );
 
-            // glow: dark tint → base tint → moderately bright (no white)
+            // glow: base tint → brighter (avoid pure black)
             Color glowBase = baseColor * 0.6f;
             cfg.glow.SetKeys(
                 new GradientColorKey[]
                 {
-                    new GradientColorKey(glowBase * 0.2f, 0f),
+                    new GradientColorKey(glowBase * 0.4f, 0f),
                     new GradientColorKey(glowBase, 0.33f),
                     new GradientColorKey(glowBase * 1.3f, 0.67f),
                     new GradientColorKey(glowBase * 1.4f, 1f)
@@ -307,8 +307,8 @@ namespace BrainlessLabs.Simulation
                 }
             );
 
-            // spot: very dark base (slightly tinted) across
-            Color spotColor = baseColor * 0.15f;
+            // spot: dark base (slightly tinted) across (avoid pure black)
+            Color spotColor = baseColor * 0.25f;
             cfg.spot.SetKeys(
                 new GradientColorKey[]
                 {
