@@ -217,8 +217,19 @@ Shader "Unlit/ProceduralStar"
                 float  _DebugPinInsideStrength;
             CBUFFER_END
 
-            float3 safeNormalize(float3 v) { return v * rsqrt(max(dot(v,v), 1e-8)); }
+            // Safely normalize a vector, returning a default up-vector if magnitude is too small.
+            // This prevents NaN/infinity from rsqrt when the input is near-zero.
+            float3 safeNormalize(float3 v)
+            {
+                float lenSq = dot(v, v);
+                if (lenSq < 1e-8)
+                    return float3(0, 1, 0);
+                return v * rsqrt(lenSq);
+            }
 
+            // Hash function: float2 -> float
+            // Magic constants (123.34, 456.21, 34.345) provide good distribution for procedural noise.
+            // These values are chosen empirically to reduce visible patterns in the output.
             float hash21(float2 p)
             {
                 p = frac(p * float2(123.34, 456.21));
@@ -226,6 +237,9 @@ Shader "Unlit/ProceduralStar"
                 return frac(p.x * p.y);
             }
 
+            // Hash function: float -> float
+            // Magic constants (0.1031, 33.33) provide pseudo-random distribution.
+            // These values are standard in procedural noise generation for good spatial distribution.
             float hash11(float p)
             {
                 p = frac(p * 0.1031);
