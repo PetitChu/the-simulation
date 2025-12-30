@@ -1,0 +1,223 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a62f7db8577643c5bd9bc1f514620248, type: 3}
+  m_Name: ProceduralStarPreset - DyingStar
+  m_EditorClassIdentifier: BrainlessLabs.Simulation::BrainlessLabs.Simulation.ProceduralStarPreset
+  bodyLow:
+    serializedVersion: 2
+    key0: {r: 0.5, g: 0.12, b: 0.03, a: 1}
+    key1: {r: 0.5, g: 0.12, b: 0.03, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  bodyHigh:
+    serializedVersion: 2
+    key0: {r: 0.95, g: 0.45, b: 0.15, a: 1}
+    key1: {r: 0.95, g: 0.45, b: 0.15, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  glow:
+    serializedVersion: 2
+    key0: {r: 0.22, g: 0.08, b: 0.02, a: 1}
+    key1: {r: 0.22, g: 0.08, b: 0.02, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  flare:
+    serializedVersion: 2
+    key0: {r: 0.85, g: 0.38, b: 0.12, a: 1}
+    key1: {r: 0.85, g: 0.38, b: 0.12, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  spot:
+    serializedVersion: 2
+    key0: {r: 0.25, g: 0.05, b: 0.01, a: 1}
+    key1: {r: 0.25, g: 0.05, b: 0.01, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  edgeSoftnessWorld: 0.004
+  bodyAlpha: 1
+  brightness: 1.2
+  rimStrength: 0.12
+  rimStart: 0.78
+  colorFromNoise: 0.95
+  paletteSteps: 4
+  timeScale: 0.6
+  rotationRPS: 0.015
+  surfaceScale: 50
+  surfaceStrength: 0.95
+  surfaceContrast: 3.5
+  evolveStrength: 0.35
+  evolveX: 0.03
+  evolveY: 0.015
+  spotsEnabled: 1
+  spotScale: 15
+  spotDetailScaleMul: 7
+  spotDetailStrength: 0.5
+  spotVortexStrength: 0.85
+  spotVortexScale: 28
+  spotVortexSpeed: 0.6
+  spotThreshold: 0.45
+  spotSoftness: 0.12
+  spotIntensity: 0.65
+  spotTintStrength: 0.5
+  glowEnabled: 1
+  glowWidthWorld: 0.15
+  glowPower: 2.8
+  glowFalloff: 3.2
+  glowIntensity: 0.9
+  glowAlpha: 0.6
+  glowEdgeSoftWorld: 0.02
+  glowBrightnessInfluence: 0.7
+  flaresEnabled: 1
+  flareRingCount: 2
+  flareRingSeed: 55
+  flareRingOrbitRPS: -0.02
+  flareRingOffsetWorld: 0.3
+  flareRingMajorWorld: 0.2
+  flareRingMinorWorld: 0.075
+  flareRingWidthWorld: 0.025
+  flareRingTilt: 0.7
+  flareRingNear: 1
+  flareRingFar: 0.3
+  flareRingRimOverlapWorld: 0.012
+  flareRingBreakup: 0.55
+  flareRingBreakupScale: 12
+  flareRingFlickerSpeed: 1.2
+  flareRingFlickerAmt: 0.45
+  flareLifeEnabled: 1
+  flareLifePeriod: 10
+  flareLifeDuty: 0.4
+  flareLifeFadeFrac: 0.18
+  flareLifeJitter: 0.35
+  flareLifeDutyJitter: 0.28
+  flareIntensity: 1.1
+  flareAlpha: 0.5
+  flarePosterizeSteps: 4
