@@ -175,7 +175,6 @@ namespace BrainlessLabs.Simulation
 
             // Set all material properties
             targetMaterial.SetFloat("_RadiusWorld", cfg.radiusWorld);
-            targetMaterial.SetFloat("_PixelSizeWorld", cfg.pixelSizeWorld);
             targetMaterial.SetFloat("_EdgeSoftnessWorld", cfg.edgeSoftnessWorld);
             targetMaterial.SetFloat("_BodyAlpha", cfg.bodyAlpha);
             targetMaterial.SetFloat("_Brightness", cfg.brightness);

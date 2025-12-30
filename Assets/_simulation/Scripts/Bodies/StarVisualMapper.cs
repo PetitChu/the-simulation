@@ -20,15 +20,9 @@ namespace BrainlessLabs.Simulation
                 5f
             );
 
-            // Keep pixelation consistent: target ~25 pixels across diameter
-            float pixelSizeWorld = Mathf.Clamp(
-                (2f * radiusWorld) / 25f,
-                0.0005f,
-                1f
-            );
-
+            // Edge softness scales with radius (pixel size left unchanged)
             float edgeSoftnessWorld = Mathf.Clamp(
-                pixelSizeWorld * 0.20f,
+                radiusWorld * 0.008f,
                 0f,
                 0.1f
             );
@@ -71,7 +65,7 @@ namespace BrainlessLabs.Simulation
             float flareRingOffsetWorld = radiusWorld * 0.9f;
             float flareRingMajorWorld = radiusWorld * 0.65f;
             float flareRingMinorWorld = radiusWorld * 0.25f;
-            float flareRingWidthWorld = Mathf.Clamp(pixelSizeWorld * 1.25f, 0f, 2f);
+            float flareRingWidthWorld = Mathf.Clamp(radiusWorld * 0.08f, 0f, 2f);
 
             // Breakup/jitter from chaos
             float flareRingBreakup = Mathf.Lerp(0.2f, 0.85f, s.chaos);
@@ -102,7 +96,6 @@ namespace BrainlessLabs.Simulation
 
             // H) Fill outCfg with all computed values
             outCfg.radiusWorld = radiusWorld;
-            outCfg.pixelSizeWorld = pixelSizeWorld;
             outCfg.edgeSoftnessWorld = edgeSoftnessWorld;
 
             outCfg.bodyAlpha = 1f;
