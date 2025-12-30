@@ -56,40 +56,18 @@ Shader "Unlit/ProceduralStar"
         _GlowBrightnessInfluence ("Glow Brightness Influence", Range(0, 2)) = 0.75
 
         // --------------------------------------------
-        // FLARES (RING / DISK ARCS)
+        // FLARES (10 essential parameters)
         // --------------------------------------------
         _FlaresEnabled ("Flares Enabled", Range(0,1)) = 1
         _FlareRingCount ("Ring Count", Range(0, 6)) = 1
         _FlareRingSeed ("Ring Seed", Range(0, 1000)) = 13
-
-        _FlareRingOrbitRPS ("Ring Orbit Speed (turns/sec)", Range(-0.5, 0.5)) = 0.04
-
-        _FlareRingMajorWorld ("Ring Major Radius (world units)", Range(0.0, 10.0)) = 0.16
-        _FlareRingMinorWorld ("Ring Minor Radius (world units)", Range(0.0, 10.0)) = 0.06
-        _FlareRingWidthWorld ("Ring Stroke Width (world units)", Range(0.0, 2.0)) = 0.02
-
-        _FlareRingTilt ("Ring Tilt (near/far bias)", Range(0,1)) = 0.65
-        _FlareRingNear ("Ring Near Bright", Range(0,2)) = 1.0
-        _FlareRingFar  ("Ring Far Bright", Range(0,2)) = 0.35
-
-        _FlareRingRimOverlapWorld ("Ring Rim Overlap (world units)", Range(0.0, 1.0)) = 0.01
-
+        _FlareRingMajorWorld ("Ring Major Radius (world units)", Range(0.0, 1.0)) = 0.08
+        _FlareRingMinorWorld ("Ring Minor Radius (world units)", Range(0.0, 1.0)) = 0.035
+        _FlareRingWidthWorld ("Ring Stroke Width (world units)", Range(0.0, 0.2)) = 0.012
         _FlareRingBreakup ("Ring Breakup", Range(0,1)) = 0.45
-        _FlareRingBreakupScale ("Ring Breakup Scale", Range(1, 64)) = 18
-        _FlareRingFlickerSpeed ("Ring Flicker Speed", Range(0, 8)) = 2.0
-        _FlareRingFlickerAmt   ("Ring Flicker Amount", Range(0, 1)) = 0.35
-
-        // LIFETIME ENVELOPE (spawn/die)
-        _FlareLifeEnabled ("Flare Lifetime Enabled", Range(0,1)) = 1
-        _FlareLifePeriod  ("Flare Lifetime Period (sec)", Range(0.25, 30.0)) = 6.0
-        _FlareLifeDuty    ("Flare Active Fraction", Range(0.05, 0.95)) = 0.55
-        _FlareLifeFadeFrac ("Flare Fade Fraction (of period)", Range(0.0, 0.45)) = 0.12
         _FlareLifeJitter  ("Flare Period Jitter", Range(0.0, 0.8)) = 0.25
         _FlareLifeDutyJitter ("Flare Duty Jitter", Range(0.0, 0.6)) = 0.20
-
         _FlareIntensity ("Flare Intensity", Range(0, 6)) = 1.2
-        _FlareAlpha ("Flare Alpha", Range(0, 1)) = 0.55
-        _FlarePosterizeSteps ("Flare Posterize Steps", Range(0, 32)) = 6
 
         // Debug dropdown:
         [Enum(Final,0, DiscMask,1, SurfaceNoise,2, Spots,3, Glow,4, SpinPin,5, Flares,6)]
@@ -184,29 +162,13 @@ Shader "Unlit/ProceduralStar"
                 float  _FlaresEnabled;
                 float  _FlareRingCount;
                 float  _FlareRingSeed;
-                float  _FlareRingOrbitRPS;
                 float  _FlareRingMajorWorld;
                 float  _FlareRingMinorWorld;
                 float  _FlareRingWidthWorld;
-                float  _FlareRingTilt;
-                float  _FlareRingNear;
-                float  _FlareRingFar;
-                float  _FlareRingRimOverlapWorld;
                 float  _FlareRingBreakup;
-                float  _FlareRingBreakupScale;
-                float  _FlareRingFlickerSpeed;
-                float  _FlareRingFlickerAmt;
-
-                float  _FlareLifeEnabled;
-                float  _FlareLifePeriod;
-                float  _FlareLifeDuty;
-                float  _FlareLifeFadeFrac;
                 float  _FlareLifeJitter;
                 float  _FlareLifeDutyJitter;
-
                 float  _FlareIntensity;
-                float  _FlareAlpha;
-                float  _FlarePosterizeSteps;
 
                 float  _DebugMode;
                 float  _DebugPinWidth;
@@ -507,7 +469,7 @@ Shader "Unlit/ProceduralStar"
                     float aBase = max(_FlareRingMajorWorld / radius, 0.0);
                     float bBase = max(_FlareRingMinorWorld / radius, 0.0);
                     float wBase = max(_FlareRingWidthWorld / radius, 0.0);
-                    float rimOverlap = max(_FlareRingRimOverlapWorld / radius, 0.0);
+                    const float rimOverlap = 0.01 / radius; // Hardcoded rim overlap
 
                     float aaN = max(px / radius, 0.0015);
 
@@ -515,7 +477,7 @@ Shader "Unlit/ProceduralStar"
                     float outsideMask = smoothstep(1.0 - rimOverlap, 1.0 + aaN, discR);
 
                     float flareBrightBoost = max(0.0, 1.0 + 0.35 * (_Brightness - 1.0));
-                    float tilt = saturate(_FlareRingTilt);
+                    const float tilt = 0.65; // Hardcoded near/far tilt
 
                     // Star rotation angle for visibility calculation
                     float rotAngle = (_RotationRPS * TWO_PI) * timeSec;
@@ -567,19 +529,19 @@ Shader "Unlit/ProceduralStar"
 
                         float2 dir = float2(cos(baseAng), sin(baseAng));
 
-                        // Calculate lifecycle first
-                        float life = 1.0;
-                        if (_FlareLifeEnabled > 0.5)
-                        {
-                            float pJ = lerp(1.0 - _FlareLifeJitter, 1.0 + _FlareLifeJitter, hash11(seed + 101.1));
-                            float dJ = lerp(1.0 - _FlareLifeDutyJitter, 1.0 + _FlareLifeDutyJitter, hash11(seed + 202.2));
+                        // Calculate lifecycle (always enabled)
+                        const float basePeriod = 6.0;  // Hardcoded lifetime period
+                        const float baseDuty = 0.55;   // Hardcoded active fraction
+                        const float fadeFrac = 0.12;   // Hardcoded fade fraction
 
-                            float period = max(0.25, _FlareLifePeriod * pJ);
-                            float duty   = clamp(_FlareLifeDuty * dJ, 0.05, 0.95);
+                        float pJ = lerp(1.0 - _FlareLifeJitter, 1.0 + _FlareLifeJitter, hash11(seed + 101.1));
+                        float dJ = lerp(1.0 - _FlareLifeDutyJitter, 1.0 + _FlareLifeDutyJitter, hash11(seed + 202.2));
 
-                            float phase01 = hash11(seed + 303.3);
-                            life = pulseEnvelope01(timeSec, period, duty, _FlareLifeFadeFrac, phase01);
-                        }
+                        float period = max(0.25, basePeriod * pJ);
+                        float duty   = clamp(baseDuty * dJ, 0.05, 0.95);
+
+                        float phase01 = hash11(seed + 303.3);
+                        float life = pulseEnvelope01(timeSec, period, duty, fadeFrac, phase01);
 
                         // Scale dimensions with lifecycle (grow/shrink)
                         float sizeScale = life;
@@ -602,26 +564,34 @@ Shader "Unlit/ProceduralStar"
                         float theta = atan2(p.y / max(b,1e-6), p.x / max(a,1e-6));
                         float t01 = (theta + 3.14159265) / TWO_PI;
 
+                        // Near/far brightness (hardcoded values)
+                        const float nearBright = 1.0;
+                        const float farBright = 0.35;
                         float depth = 0.5 + 0.5 * sin(theta);
-                        float nearFar = lerp(_FlareRingFar, _FlareRingNear, lerp(0.5, depth, tilt));
+                        float nearFar = lerp(farBright, nearBright, lerp(0.5, depth, tilt));
 
+                        // Breakup noise (hardcoded scale)
                         if (_FlareRingBreakup > 0.001)
                         {
-                            float nB = valueNoise2D(float2(t01 * _FlareRingBreakupScale, timeSec * 0.55 + seed));
+                            const float breakupScale = 18.0;
+                            float nB = valueNoise2D(float2(t01 * breakupScale, timeSec * 0.55 + seed));
                             float breakup = lerp(1.0, lerp(0.55, 1.25, nB), _FlareRingBreakup);
                             stroke *= breakup;
                         }
 
+                        // Flicker (hardcoded parameters)
+                        const float flickerSpeed = 2.0;
+                        const float flickerAmt = 0.35;
                         float flick = 1.0;
-                        if (_FlareRingFlickerAmt > 0.001)
+                        if (flickerAmt > 0.001)
                         {
-                            float tF = timeSec * _FlareRingFlickerSpeed;
+                            float tF = timeSec * flickerSpeed;
                             float a0 = hash11(seed * 3.1 + floor(tF));
                             float a1 = hash11(seed * 3.1 + floor(tF) + 1.0);
                             float ft = frac(tF);
                             ft = ft * ft * (3.0 - 2.0 * ft);
                             float f = lerp(a0, a1, ft);
-                            flick = lerp(1.0, f, _FlareRingFlickerAmt);
+                            flick = lerp(1.0, f, flickerAmt);
                         }
 
                         // Life is already calculated above and used for size scaling
@@ -631,9 +601,10 @@ Shader "Unlit/ProceduralStar"
                         float flareVal = m * _FlareIntensity * nearFar * flick * flareBrightBoost * bBoost;
                         flareVal *= flareNoiseMul;
 
-                        float fSteps = max(0.0, _FlarePosterizeSteps);
-                        if (fSteps >= 2.0)
-                            flareVal = floor(flareVal * fSteps) / fSteps;
+                        // Posterization (hardcoded steps)
+                        const float posterizeSteps = 6.0;
+                        if (posterizeSteps >= 2.0)
+                            flareVal = floor(flareVal * posterizeSteps) / posterizeSteps;
 
                         flareRGB += flareCol * flareVal;
                     }
@@ -696,7 +667,7 @@ Shader "Unlit/ProceduralStar"
 
                 float alphaBody  = disc * _BodyAlpha;
                 float alphaGlow  = saturate(glow * _GlowAlpha);
-                float alphaFlare = flareMask * _FlareAlpha;
+                float alphaFlare = flareMask * 0.55; // Hardcoded flare alpha
 
                 float finalA = saturate(alphaBody + alphaGlow + alphaFlare);
                 return float4(finalRGB, finalA);
