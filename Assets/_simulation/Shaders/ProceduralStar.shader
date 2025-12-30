@@ -627,7 +627,7 @@ Shader "Unlit/ProceduralStar"
 
                 int dm = (int)round(_DebugMode);
                 if (dm == 1) return float4(disc.xxx, 1);
-                if (dm == 2) return float4(nSurf.xxx, 1);
+                if (dm == 2) return float4(surfaceNoise.xxx, 1);
                 if (dm == 3) return float4(spotsMask.xxx, 1);
                 if (dm == 4) return float4(glow.xxx, 1);
                 if (dm == 6) return float4(flareMask.xxx, 1);
