@@ -101,7 +101,11 @@ namespace BrainlessLabs.Simulation
         [ContextMenu("Bake Ramp Atlas Now")]
         public void BakeAndApply()
         {
-            if (targetMaterial == null) return;
+            if (targetMaterial == null)
+            {
+                Debug.LogWarning("ProceduralStar.BakeAndApply was called, but 'targetMaterial' is not assigned. Changes will not be applied.", this);
+                return;
+            }
 
             if (preset != null)
             {
