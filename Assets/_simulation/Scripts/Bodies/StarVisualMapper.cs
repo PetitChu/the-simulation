@@ -211,13 +211,13 @@ namespace BrainlessLabs.Simulation
         /// </summary>
         private static void BuildGradients(Color baseColor, ProceduralStarVisualConfig cfg)
         {
-            // bodyLow: smooth gradient from poles to center
+            // bodyLow: uniformly bright with subtle variation
             cfg.bodyLow.SetKeys(
                 new GradientColorKey[]
                 {
-                    new GradientColorKey(baseColor * 0.3f, 0f),
-                    new GradientColorKey(baseColor * 0.4f, 0.33f),
-                    new GradientColorKey(baseColor, 0.67f),
+                    new GradientColorKey(baseColor * 0.9f, 0f),
+                    new GradientColorKey(baseColor, 0.33f),
+                    new GradientColorKey(baseColor * 1.05f, 0.67f),
                     new GradientColorKey(baseColor * 1.1f, 1f)
                 },
                 new GradientAlphaKey[]
@@ -227,13 +227,13 @@ namespace BrainlessLabs.Simulation
                 }
             );
 
-            // bodyHigh: smooth gradient from poles to center
+            // bodyHigh: uniformly bright with subtle variation
             cfg.bodyHigh.SetKeys(
                 new GradientColorKey[]
                 {
-                    new GradientColorKey(baseColor * 0.7f, 0f),
-                    new GradientColorKey(baseColor, 0.33f),
-                    new GradientColorKey(baseColor * 1.2f, 0.67f),
+                    new GradientColorKey(baseColor * 1.1f, 0f),
+                    new GradientColorKey(baseColor * 1.15f, 0.33f),
+                    new GradientColorKey(baseColor * 1.25f, 0.67f),
                     new GradientColorKey(baseColor * 1.3f, 1f)
                 },
                 new GradientAlphaKey[]
