@@ -111,7 +111,7 @@ namespace BrainlessLabs.Simulation
 
             outCfg.surfaceScale = 80f;
             outCfg.surfaceStrength = 0.75f;
-            outCfg.surfaceContrast = 2.0f;
+            outCfg.surfaceContrast = Mathf.Lerp(2.0f, 4.0f, s.chaos);
             outCfg.evolveStrength = 0.25f;
             outCfg.evolveX = 0.05f;
             outCfg.evolveY = 0.02f;

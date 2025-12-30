@@ -181,7 +181,7 @@ namespace BrainlessLabs.Simulation
 
             // Note: Art/visual parameters are not set by controller (set manually in material):
             // _RimStrength, _RimStart, _ColorFromNoise, _PaletteSteps
-            // _SurfaceScale, _SurfaceStrength, _SurfaceContrast, _EvolveStrength, _EvolveX, _EvolveY
+            // _SurfaceScale, _SurfaceStrength, _EvolveStrength, _EvolveX, _EvolveY
             // _SpotScale, _SpotDetailScaleMul, _SpotDetailStrength, _SpotSoftness
             // _SpotVortexScale (fixed), _GlowPower, _GlowFalloff, _GlowEdgeSoftWorld, _GlowBrightnessInfluence
             // _FlareRingTilt, _FlareRingNear, _FlareRingFar, _FlareRingRimOverlapWorld, _FlareRingBreakupScale
@@ -190,6 +190,8 @@ namespace BrainlessLabs.Simulation
 
             targetMaterial.SetFloat("_TimeScale", cfg.timeScale);
             targetMaterial.SetFloat("_RotationRPS", cfg.rotationRPS);
+
+            targetMaterial.SetFloat("_SurfaceContrast", cfg.surfaceContrast);
 
             targetMaterial.SetFloat("_SpotsEnabled", cfg.spotsEnabled);
             targetMaterial.SetFloat("_SpotThreshold", cfg.spotThreshold);
