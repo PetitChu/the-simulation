@@ -392,8 +392,8 @@ Shader "Unlit/ProceduralStar"
 
                 float2 timeOff = float2(timeSec * _EvolveX, timeSec * _EvolveY) * _EvolveStrength;
 
-                float nSurf = triplanarChunkyNoise(nR, _SurfaceScale, timeOff);
-                float surf  = pow(max(nSurf, 1e-5), _SurfaceContrast);
+                float surfaceNoise = triplanarChunkyNoise(nR, _SurfaceScale, timeOff);
+                float surf  = pow(max(surfaceNoise, 1e-5), _SurfaceContrast);
                 float surfMix = lerp(1.0, surf, _SurfaceStrength);
 
                 float rim   = smoothstep(_RimStart, 1.0, nd);
