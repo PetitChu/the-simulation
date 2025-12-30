@@ -61,11 +61,11 @@ namespace BrainlessLabs.Simulation
                 6f
             );
 
-            // Ring sizes scale with radius
-            float flareRingOffsetWorld = radiusWorld * 0.9f;
-            float flareRingMajorWorld = radiusWorld * 0.65f;
-            float flareRingMinorWorld = radiusWorld * 0.25f;
-            float flareRingWidthWorld = Mathf.Clamp(radiusWorld * 0.08f, 0f, 2f);
+            // Ring sizes scale with radius (small prominence-like structures)
+            float flareRingOffsetWorld = radiusWorld * 0.12f;
+            float flareRingMajorWorld = radiusWorld * 0.08f;
+            float flareRingMinorWorld = radiusWorld * 0.035f;
+            float flareRingWidthWorld = Mathf.Clamp(radiusWorld * 0.012f, 0f, 0.2f);
 
             // Breakup/jitter from chaos
             float flareRingBreakup = Mathf.Lerp(0.2f, 0.85f, s.chaos);

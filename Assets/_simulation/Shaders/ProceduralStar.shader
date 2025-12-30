@@ -557,9 +557,26 @@ Shader "Unlit/ProceduralStar"
 
                         float2 dir = float2(cos(ang), sin(ang));
 
+                        // Calculate lifecycle first
+                        float life = 1.0;
+                        if (_FlareLifeEnabled > 0.5)
+                        {
+                            float pJ = lerp(1.0 - _FlareLifeJitter, 1.0 + _FlareLifeJitter, hash11(seed + 101.1));
+                            float dJ = lerp(1.0 - _FlareLifeDutyJitter, 1.0 + _FlareLifeDutyJitter, hash11(seed + 202.2));
+
+                            float period = max(0.25, _FlareLifePeriod * pJ);
+                            float duty   = clamp(_FlareLifeDuty * dJ, 0.05, 0.95);
+
+                            float phase01 = hash11(seed + 303.3);
+                            life = pulseEnvelope01(timeSec, period, duty, _FlareLifeFadeFrac, phase01);
+                        }
+
+                        // Scale dimensions with lifecycle (grow/shrink)
+                        float sizeScale = life;
                         float off = offBase * lerp(0.80, 1.20, r1);
-                        float a = aBase * lerp(0.80, 1.30, r2);
-                        float b = bBase * lerp(0.80, 1.20, r3);
+                        float a = aBase * lerp(0.80, 1.30, r2) * sizeScale;
+                        float b = bBase * lerp(0.80, 1.20, r3) * sizeScale;
+                        float w = wBase * 0.5 * sizeScale;
 
                         float alignedAxis = baseAng;
                         float randomAxis  = (r2 - 0.5) * 1.2;
@@ -568,7 +585,7 @@ Shader "Unlit/ProceduralStar"
                         float2 p = uv - dir * off;
                         p = rot2(p, ellAng);
 
-                        float stroke = ellipseStroke(p, a, b, wBase * 0.5, aaN);
+                        float stroke = ellipseStroke(p, a, b, w, aaN);
 
                         float theta = atan2(p.y / max(b,1e-6), p.x / max(a,1e-6));
                         float t01 = (theta + 3.14159265) / TWO_PI;
@@ -595,19 +612,7 @@ Shader "Unlit/ProceduralStar"
                             flick = lerp(1.0, f, _FlareRingFlickerAmt);
                         }
 
-                        float life = 1.0;
-                        if (_FlareLifeEnabled > 0.5)
-                        {
-                            float pJ = lerp(1.0 - _FlareLifeJitter, 1.0 + _FlareLifeJitter, hash11(seed + 101.1));
-                            float dJ = lerp(1.0 - _FlareLifeDutyJitter, 1.0 + _FlareLifeDutyJitter, hash11(seed + 202.2));
-
-                            float period = max(0.25, _FlareLifePeriod * pJ);
-                            float duty   = clamp(_FlareLifeDuty * dJ, 0.05, 0.95);
-
-                            float phase01 = hash11(seed + 303.3);
-                            life = pulseEnvelope01(timeSec, period, duty, _FlareLifeFadeFrac, phase01);
-                        }
-
+                        // Life is already calculated above and used for size scaling
                         float m = stroke * outsideMask * life;
                         flareMask = saturate(flareMask + m);
 
