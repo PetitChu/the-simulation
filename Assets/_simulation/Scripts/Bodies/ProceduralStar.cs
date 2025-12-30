@@ -63,7 +63,12 @@ namespace BrainlessLabs.Simulation
         // Unity calls this when the component is added or when you choose "Reset" in the Inspector
         private void Reset()
         {
-            // Do NOT pull from material here anymore to avoid any risk of resetting to defaults if the material is not yet configured or is a fresh asset
+            // Intentionally do not read default values from targetMaterial here.
+            // A previous implementation copied settings from the material during Reset,
+            // which could overwrite user configuration when the material was newly created
+            // or not yet fully set up, effectively resetting it back to shader defaults.
+            // Reset should only initialize this component's fields and must never modify
+            // or depend on the current state of the material asset.
             preset = null;
             width = 256;
             hdr = true;
