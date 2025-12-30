@@ -1,0 +1,125 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Star
+  m_Shader: {fileID: 4800000, guid: 36b2801341ca5c74e8fe94dc46b99e6b, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _RampAtlas:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BodyAlpha: 1
+    - _Brightness: 1.092
+    - _ColorFromNoise: 0.208
+    - _DebugMode: 0
+    - _DebugPinEndRadius: 0.0308
+    - _DebugPinExtend: 0.171
+    - _DebugPinInsideStrength: 0.25
+    - _DebugPinWidth: 0.01
+    - _DebugSpinLineWidth: 0.012
+    - _DebugSpinMarkerLength: 0.386
+    - _DiffMin: 0.75
+    - _DiffPower: 2
+    - _EdgeSoftnessWorld: 0.002
+    - _EvolveStrength: 0.751
+    - _EvolveX: 0.96
+    - _EvolveY: -0.34
+    - _FlareAlpha: 0.78
+    - _FlareArcHeightWorld: 2.37
+    - _FlareBreakup: 0.382
+    - _FlareCount: 5.36
+    - _FlareFlickerAmt: 0.829
+    - _FlareFlickerSpeed: 6.02
+    - _FlareFootSep: 0.139
+    - _FlareIntensity: 5.28
+    - _FlareLengthWorld: 0.74
+    - _FlareLifeDuty: 0.55
+    - _FlareLifeDutyJitter: 0.2
+    - _FlareLifeEnabled: 1
+    - _FlareLifeFadeFrac: 0.12
+    - _FlareLifeJitter: 0.606
+    - _FlareLifePeriod: 6
+    - _FlarePosterizeSteps: 26.59
+    - _FlareRingBreakup: 0.45
+    - _FlareRingBreakupScale: 18
+    - _FlareRingCount: 4.57
+    - _FlareRingFar: 0.35
+    - _FlareRingFlickerAmt: 0.622
+    - _FlareRingFlickerSpeed: 5.08
+    - _FlareRingMajorWorld: 1.05
+    - _FlareRingMinorWorld: 0.37
+    - _FlareRingNear: 0.967
+    - _FlareRingOffsetWorld: 2.95
+    - _FlareRingOrbitRPS: -0.166
+    - _FlareRingRimOverlapWorld: 0.316
+    - _FlareRingSeed: 295
+    - _FlareRingTilt: 0.702
+    - _FlareRingWidthWorld: 0.07
+    - _FlareRotateSpeed: -0.428
+    - _FlareSeed: 640
+    - _FlareTaper: 0.99
+    - _FlareWidthWorld: 0.038
+    - _FlaresEnabled: 1
+    - _GlowAlpha: 0.477
+    - _GlowBrightnessInfluence: 0.75
+    - _GlowEdgeSoftWorld: 0.433
+    - _GlowEnabled: 1
+    - _GlowFalloff: 3.21
+    - _GlowIntensity: 2.95
+    - _GlowPower: 3.94
+    - _GlowWidthWorld: 0.75
+    - _PaletteSteps: 32
+    - _PixelSizeWorld: 0.093
+    - _RadiusWorld: 3.88
+    - _RampRows: 5
+    - _RimStart: 0.82
+    - _RimStrength: 0.796
+    - _RotationRPS: 0.1
+    - _SpotDetailScaleMul: 5.66
+    - _SpotDetailStrength: 0.828
+    - _SpotIntensity: 0.422
+    - _SpotMessiness: 0.107
+    - _SpotScale: 20
+    - _SpotSoftness: 0.15
+    - _SpotThreshold: 0.55
+    - _SpotTintStrength: 0.488
+    - _SpotVortexScale: 42
+    - _SpotVortexSpeed: 2.46
+    - _SpotVortexStrength: 0.65
+    - _SpotsEnabled: 1
+    - _SurfaceContrast: 2
+    - _SurfaceScale: 80
+    - _SurfaceStrength: 0.75
+    - _TimeScale: 0.25
+    m_Colors:
+    - _CenterOffsetXY: {r: 0, g: 0, b: 0, a: 0}
+    - _DebugSpinMarker: {r: 0, g: 0, b: 0, a: 0}
+    - _FlareColor: {r: 0.6, g: 0.049999967, b: 0.03, a: 1}
+    - _GlowColor: {r: 0.17999998, g: 0.03, b: 0.03, a: 1}
+    - _HighColor: {r: 1, g: 0.34999996, b: 0.09999997, a: 1}
+    - _LowColor: {r: 0.6, g: 0.049999982, b: 0.03, a: 1}
+    - _SpinAxis: {r: 0.2, g: 1, b: 0.75, a: 0}
+    - _SpotTint: {r: 0.8792453, g: 0.6306122, b: 0.31022424, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
