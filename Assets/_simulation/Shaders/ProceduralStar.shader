@@ -562,7 +562,7 @@ Shader "Unlit/ProceduralStar"
                         float a = aBase * lerp(0.80, 1.30, r2);
                         float b = bBase * lerp(0.80, 1.20, r3);
 
-                        float alignedAxis = ang;
+                        float alignedAxis = baseAng;
                         float randomAxis  = (r2 - 0.5) * 1.2;
                         float ellAng = lerp(randomAxis, alignedAxis, 0.85) + (r3 - 0.5) * 0.10;
 
