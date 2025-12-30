@@ -128,12 +128,13 @@ namespace BrainlessLabs.Simulation
             // Fill pixels: row-major (y = 0..ROWS-1), each row is a gradient from x=0..width-1
             var pixels = new Color[width * ROWS];
 
-            FillRow(pixels, 0, (preset != null && preset.bodyLow != null) ? preset.bodyLow : bodyLow);
-            FillRow(pixels, 1, (preset != null && preset.bodyHigh != null) ? preset.bodyHigh : bodyHigh);
-            FillRow(pixels, 2, (preset != null && preset.glow != null) ? preset.glow : glow);
-            FillRow(pixels, 3, (preset != null && preset.flare != null) ? preset.flare : flare);
-            FillRow(pixels, 4, (preset != null && preset.spot != null) ? preset.spot : spot);
+            bool usePreset = preset != null;
 
+            FillRow(pixels, 0, usePreset ? preset.bodyLow : bodyLow);
+            FillRow(pixels, 1, usePreset ? preset.bodyHigh : bodyHigh);
+            FillRow(pixels, 2, usePreset ? preset.glow : glow);
+            FillRow(pixels, 3, usePreset ? preset.flare : flare);
+            FillRow(pixels, 4, usePreset ? preset.spot : spot);
             _atlas.SetPixels(pixels);
             _atlas.Apply(updateMipmaps: false, makeNoLongerReadable: false);
 
