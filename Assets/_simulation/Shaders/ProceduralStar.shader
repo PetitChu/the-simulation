@@ -378,9 +378,9 @@ Shader "Unlit/ProceduralStar"
                 float2 uvF = pF / radius;
                 float2 uv  = pQ / radius;
 
-                // top->bottom factor
-                float gradT_body   = saturate(uv.y  * 0.5 + 0.5);
-                float gradT_smooth = saturate(uvF.y * 0.5 + 0.5);
+                // center->pole factor (symmetric)
+                float gradT_body   = saturate(abs(uv.y));
+                float gradT_smooth = saturate(abs(uvF.y));
 
                 float rr = dot(uv, uv);
                 float z  = sqrt(max(0.0, 1.0 - rr));
