@@ -95,47 +95,30 @@ namespace BrainlessLabs.Simulation
             BuildGradients(baseColor, outCfg);
 
             // H) Fill outCfg with all computed values
+            // Only set gameplay-driven parameters, not art parameters
             outCfg.radiusWorld = radiusWorld;
             outCfg.edgeSoftnessWorld = edgeSoftnessWorld;
 
             outCfg.bodyAlpha = 1f;
             outCfg.brightness = brightness;
-            outCfg.rimStrength = 0.08f;
-            outCfg.rimStart = 0.82f;
-
-            outCfg.colorFromNoise = 0.85f;
-            outCfg.paletteSteps = 6f;
 
             outCfg.timeScale = timeScale;
             outCfg.rotationRPS = rotationRps;
 
-            outCfg.surfaceScale = 80f;
-            outCfg.surfaceStrength = 0.75f;
             outCfg.surfaceContrast = Mathf.Lerp(5.0f, 1.0f, s.chaos);
-            outCfg.evolveStrength = 0.25f;
-            outCfg.evolveX = 0.05f;
-            outCfg.evolveY = 0.02f;
 
             outCfg.spotsEnabled = spotsEnabled;
-            outCfg.spotScale = 22f;
-            outCfg.spotDetailScaleMul = 5f;
-            outCfg.spotDetailStrength = 0.35f;
             outCfg.spotVortexStrength = spotVortexStrength;
             outCfg.spotVortexScale = spotVortexScale;
             outCfg.spotVortexSpeed = spotVortexSpeed;
             outCfg.spotThreshold = spotThreshold;
-            outCfg.spotSoftness = 0.18f;
             outCfg.spotIntensity = spotIntensity;
             outCfg.spotTintStrength = spotTintStrength;
 
             outCfg.glowEnabled = glowEnabled;
             outCfg.glowWidthWorld = glowWidthWorld;
-            outCfg.glowPower = 2.0f;
-            outCfg.glowFalloff = 2.5f;
             outCfg.glowIntensity = glowIntensity;
             outCfg.glowAlpha = glowAlpha;
-            outCfg.glowEdgeSoftWorld = 0.01f;
-            outCfg.glowBrightnessInfluence = 0.75f;
 
             outCfg.flaresEnabled = flaresEnabled;
             outCfg.flareRingCount = flareRingCount;
@@ -145,24 +128,10 @@ namespace BrainlessLabs.Simulation
             outCfg.flareRingMajorWorld = flareRingMajorWorld;
             outCfg.flareRingMinorWorld = flareRingMinorWorld;
             outCfg.flareRingWidthWorld = flareRingWidthWorld;
-            outCfg.flareRingTilt = 0.65f;
-            outCfg.flareRingNear = 1.0f;
-            outCfg.flareRingFar = 0.35f;
-            outCfg.flareRingRimOverlapWorld = 0.01f;
             outCfg.flareRingBreakup = flareRingBreakup;
-            outCfg.flareRingBreakupScale = 18f;
-            outCfg.flareRingFlickerSpeed = 2.0f;
-            outCfg.flareRingFlickerAmt = 0.35f;
-
-            outCfg.flareLifeEnabled = 1f;
-            outCfg.flareLifePeriod = 6.0f;
-            outCfg.flareLifeDuty = 0.55f;
-            outCfg.flareLifeFadeFrac = 0.12f;
             outCfg.flareLifeJitter = flareLifeJitter;
             outCfg.flareLifeDutyJitter = flareLifeDutyJitter;
             outCfg.flareIntensity = flareIntensity;
-            outCfg.flareAlpha = 0.55f;
-            outCfg.flarePosterizeSteps = 6f;
         }
 
         /// <summary>
