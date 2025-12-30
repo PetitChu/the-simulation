@@ -29,9 +29,9 @@ namespace BrainlessLabs.Simulation
 
             // C) Brightness & timing
             float brightness = Mathf.Clamp(
-                0.8f + Mathf.Pow(s.mass, 1.15f) * 0.4f + s.temperature * 0.6f,
+                0.6f + Mathf.Pow(s.mass, 1.15f) * 0.2f + s.temperature * 0.2f,
                 0.1f,
-                3f
+                1.5f
             );
 
             float timeScale = 1f + s.chaos * 0.5f;
