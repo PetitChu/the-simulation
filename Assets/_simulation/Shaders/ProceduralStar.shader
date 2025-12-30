@@ -514,11 +514,11 @@ Shader "Unlit/ProceduralStar"
                     float discR = length(uv);
                     float outsideMask = smoothstep(1.0 - rimOverlap, 1.0 + aaN, discR);
 
-                    // Flares orbit locked to star rotation
-                    float orbitAng = (_RotationRPS * TWO_PI) * timeSec;
-
                     float flareBrightBoost = max(0.0, 1.0 + 0.35 * (_Brightness - 1.0));
                     float tilt = saturate(_FlareRingTilt);
+
+                    // Star rotation angle for visibility calculation
+                    float rotAngle = (_RotationRPS * TWO_PI) * timeSec;
 
                     // brightness-noise agency for flares
                     float2 dir2 = uv;
@@ -549,11 +549,23 @@ Shader "Unlit/ProceduralStar"
                         float r2 = hash11(seed + 21.4);
                         float r3 = hash11(seed + 44.0);
 
+                        // Fixed angular position on star surface
                         float baseAng = (fi / max(1.0, (float)count)) * TWO_PI;
                         baseAng += (r0 - 0.5) * 0.75;
-                        float ang = baseAng + orbitAng;
 
-                        float2 dir = float2(cos(ang), sin(ang));
+                        // Calculate 3D position on sphere and check visibility after rotation
+                        float2 flareUV = float2(cos(baseAng), sin(baseAng));
+                        float flareZ = sqrt(max(0.0, 1.0 - dot(flareUV, flareUV)));
+                        float3 flareNormal = float3(flareUV.x, flareUV.y, flareZ);
+
+                        // Rotate the flare position with the star
+                        float3 flareRotated = rotateAroundAxis(flareNormal, axis, rotAngle);
+
+                        // Visibility: flares on far side (z <= 0) are invisible
+                        float visibility = smoothstep(-0.1, 0.2, flareRotated.z);
+                        if (visibility < 0.01) continue; // Skip flares on far side
+
+                        float2 dir = float2(cos(baseAng), sin(baseAng));
 
                         // Calculate lifecycle first
                         float life = 1.0;
@@ -576,7 +588,9 @@ Shader "Unlit/ProceduralStar"
                         float b = bBase * lerp(0.80, 1.20, r3) * sizeScale;
                         float w = wBase * 0.5 * sizeScale;
 
-                        float alignedAxis = baseAng;
+                        // Ellipse orientation: align with rotation direction
+                        // The ellipse should be oriented perpendicular to the radial direction
+                        float alignedAxis = baseAng + 1.57079632; // +90 degrees (perpendicular to radial)
                         float randomAxis  = (r2 - 0.5) * 1.2;
                         float ellAng = lerp(randomAxis, alignedAxis, 0.85) + (r3 - 0.5) * 0.10;
 
@@ -611,7 +625,7 @@ Shader "Unlit/ProceduralStar"
                         }
 
                         // Life is already calculated above and used for size scaling
-                        float m = stroke * outsideMask * life;
+                        float m = stroke * outsideMask * life * visibility;
                         flareMask = saturate(flareMask + m);
 
                         float flareVal = m * _FlareIntensity * nearFar * flick * flareBrightBoost * bBoost;
