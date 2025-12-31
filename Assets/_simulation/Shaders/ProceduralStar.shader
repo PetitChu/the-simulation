@@ -473,8 +473,9 @@ Shader "Unlit/ProceduralStar"
 
                     float aaN = max(px / radius, 0.0015);
 
-                    float discR = length(uv);
-                    float outsideMask = smoothstep(1.0 - rimOverlap, 1.0 + aaN, discR);
+                    // Flares should be visible at and near the star edge
+                    // No longer need outsideMask since flares are positioned at surface
+                    float outsideMask = 1.0;
 
                     float flareBrightBoost = max(0.0, 1.0 + 0.35 * (_Brightness - 1.0));
                     const float tilt = 0.65; // Hardcoded near/far tilt
