@@ -225,12 +225,13 @@ namespace BrainlessLabs.Simulation
             history.Clear();
 
             // Reapply all cards with history recording enabled
-            foreach (var card in cardsToReplay.Where(c => c != null))
+            var validCards = cardsToReplay.Where(c => c != null).ToArray();
+            foreach (var card in validCards)
             {
                 ApplyCard(card);
             }
 
-            Debug.Log($"ProceduralStarController: Replayed {cardsToReplay.Length} cards from history.", this);
+            Debug.Log($"ProceduralStarController: Replayed {validCards.Length} cards from history.", this);
         }
 
         /// <summary>
