@@ -151,6 +151,73 @@ namespace BrainlessLabs.Simulation
             targetMaterial.SetFloat(rampRowsProperty, ROWS);
         }
 
+        /// <summary>
+        /// Applies a runtime visual configuration to the star.
+        /// This is the M0 runtime path that sets all shader properties and gradients.
+        /// </summary>
+        public void ApplyVisualConfig(ProceduralStarVisualConfig cfg)
+        {
+            if (targetMaterial == null)
+            {
+                Debug.LogWarning("ProceduralStar.ApplyVisualConfig: targetMaterial is null. Cannot apply config.", this);
+                return;
+            }
+
+            // Force preset to null since runtime config is the source of truth
+            preset = null;
+
+            // Copy gradients
+            bodyLow = cfg.bodyLow;
+            bodyHigh = cfg.bodyHigh;
+            glow = cfg.glow;
+            flare = cfg.flare;
+            spot = cfg.spot;
+
+            // Set all material properties
+            targetMaterial.SetFloat("_RadiusWorld", cfg.radiusWorld);
+            targetMaterial.SetFloat("_EdgeSoftnessWorld", cfg.edgeSoftnessWorld);
+            targetMaterial.SetFloat("_BodyAlpha", cfg.bodyAlpha);
+            targetMaterial.SetFloat("_Brightness", cfg.brightness);
+
+            // Note: Art/visual parameters are not set by controller (set manually in material):
+            // _RimStrength, _RimStart, _ColorFromNoise, _PaletteSteps
+            // _SurfaceScale, _SurfaceStrength, _EvolveStrength, _EvolveX, _EvolveY
+            // _SpotScale, _SpotDetailScaleMul, _SpotDetailStrength, _SpotSoftness
+            // _SpotVortexScale (fixed), _GlowPower, _GlowFalloff, _GlowEdgeSoftWorld, _GlowBrightnessInfluence
+
+            targetMaterial.SetFloat("_TimeScale", cfg.timeScale);
+            targetMaterial.SetFloat("_RotationRPS", cfg.rotationRPS);
+
+            targetMaterial.SetFloat("_SurfaceContrast", cfg.surfaceContrast);
+
+            targetMaterial.SetFloat("_SpotsEnabled", cfg.spotsEnabled);
+            targetMaterial.SetFloat("_SpotThreshold", cfg.spotThreshold);
+            targetMaterial.SetFloat("_SpotIntensity", cfg.spotIntensity);
+            targetMaterial.SetFloat("_SpotTintStrength", cfg.spotTintStrength);
+            targetMaterial.SetFloat("_SpotVortexStrength", cfg.spotVortexStrength);
+            targetMaterial.SetFloat("_SpotVortexScale", cfg.spotVortexScale);
+            targetMaterial.SetFloat("_SpotVortexSpeed", cfg.spotVortexSpeed);
+
+            targetMaterial.SetFloat("_GlowEnabled", cfg.glowEnabled);
+            targetMaterial.SetFloat("_GlowWidthWorld", cfg.glowWidthWorld);
+            targetMaterial.SetFloat("_GlowIntensity", cfg.glowIntensity);
+            targetMaterial.SetFloat("_GlowAlpha", cfg.glowAlpha);
+
+            targetMaterial.SetFloat("_FlaresEnabled", cfg.flaresEnabled);
+            targetMaterial.SetFloat("_FlareRingCount", cfg.flareRingCount);
+            targetMaterial.SetFloat("_FlareRingSeed", cfg.flareRingSeed);
+            targetMaterial.SetFloat("_FlareRingMajorWorld", cfg.flareRingMajorWorld);
+            targetMaterial.SetFloat("_FlareRingMinorWorld", cfg.flareRingMinorWorld);
+            targetMaterial.SetFloat("_FlareRingWidthWorld", cfg.flareRingWidthWorld);
+            targetMaterial.SetFloat("_FlareRingBreakup", cfg.flareRingBreakup);
+            targetMaterial.SetFloat("_FlareLifeJitter", cfg.flareLifeJitter);
+            targetMaterial.SetFloat("_FlareLifeDutyJitter", cfg.flareLifeDutyJitter);
+            targetMaterial.SetFloat("_FlareIntensity", cfg.flareIntensity);
+
+            // Bake gradients and apply to material
+            BakeAndApply();
+        }
+
         private void ApplyPreset(ProceduralStarPreset p)
         {
             targetMaterial.SetFloat("_EdgeSoftnessWorld", p.edgeSoftnessWorld);
@@ -197,7 +264,6 @@ namespace BrainlessLabs.Simulation
             targetMaterial.SetFloat("_FlareRingCount", p.flareRingCount);
             targetMaterial.SetFloat("_FlareRingSeed", p.flareRingSeed);
             targetMaterial.SetFloat("_FlareRingOrbitRPS", p.flareRingOrbitRPS);
-            targetMaterial.SetFloat("_FlareRingOffsetWorld", p.flareRingOffsetWorld);
             targetMaterial.SetFloat("_FlareRingMajorWorld", p.flareRingMajorWorld);
             targetMaterial.SetFloat("_FlareRingMinorWorld", p.flareRingMinorWorld);
             targetMaterial.SetFloat("_FlareRingWidthWorld", p.flareRingWidthWorld);

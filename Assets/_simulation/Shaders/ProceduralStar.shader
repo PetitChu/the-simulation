@@ -56,41 +56,18 @@ Shader "Unlit/ProceduralStar"
         _GlowBrightnessInfluence ("Glow Brightness Influence", Range(0, 2)) = 0.75
 
         // --------------------------------------------
-        // FLARES (RING / DISK ARCS)
+        // FLARES (10 essential parameters)
         // --------------------------------------------
         _FlaresEnabled ("Flares Enabled", Range(0,1)) = 1
         _FlareRingCount ("Ring Count", Range(0, 6)) = 1
         _FlareRingSeed ("Ring Seed", Range(0, 1000)) = 13
-
-        _FlareRingOrbitRPS ("Ring Orbit Speed (turns/sec)", Range(-0.5, 0.5)) = 0.04
-        _FlareRingOffsetWorld ("Ring Center Offset (world units)", Range(0.0, 10.0)) = 0.22
-
-        _FlareRingMajorWorld ("Ring Major Radius (world units)", Range(0.0, 10.0)) = 0.16
-        _FlareRingMinorWorld ("Ring Minor Radius (world units)", Range(0.0, 10.0)) = 0.06
-        _FlareRingWidthWorld ("Ring Stroke Width (world units)", Range(0.0, 2.0)) = 0.02
-
-        _FlareRingTilt ("Ring Tilt (near/far bias)", Range(0,1)) = 0.65
-        _FlareRingNear ("Ring Near Bright", Range(0,2)) = 1.0
-        _FlareRingFar  ("Ring Far Bright", Range(0,2)) = 0.35
-
-        _FlareRingRimOverlapWorld ("Ring Rim Overlap (world units)", Range(0.0, 1.0)) = 0.01
-
+        _FlareRingMajorWorld ("Ring Major Radius (world units)", Range(0.0, 1.0)) = 0.08
+        _FlareRingMinorWorld ("Ring Minor Radius (world units)", Range(0.0, 1.0)) = 0.035
+        _FlareRingWidthWorld ("Ring Stroke Width (world units)", Range(0.0, 0.2)) = 0.012
         _FlareRingBreakup ("Ring Breakup", Range(0,1)) = 0.45
-        _FlareRingBreakupScale ("Ring Breakup Scale", Range(1, 64)) = 18
-        _FlareRingFlickerSpeed ("Ring Flicker Speed", Range(0, 8)) = 2.0
-        _FlareRingFlickerAmt   ("Ring Flicker Amount", Range(0, 1)) = 0.35
-
-        // LIFETIME ENVELOPE (spawn/die)
-        _FlareLifeEnabled ("Flare Lifetime Enabled", Range(0,1)) = 1
-        _FlareLifePeriod  ("Flare Lifetime Period (sec)", Range(0.25, 30.0)) = 6.0
-        _FlareLifeDuty    ("Flare Active Fraction", Range(0.05, 0.95)) = 0.55
-        _FlareLifeFadeFrac ("Flare Fade Fraction (of period)", Range(0.0, 0.45)) = 0.12
         _FlareLifeJitter  ("Flare Period Jitter", Range(0.0, 0.8)) = 0.25
         _FlareLifeDutyJitter ("Flare Duty Jitter", Range(0.0, 0.6)) = 0.20
-
         _FlareIntensity ("Flare Intensity", Range(0, 6)) = 1.2
-        _FlareAlpha ("Flare Alpha", Range(0, 1)) = 0.55
-        _FlarePosterizeSteps ("Flare Posterize Steps", Range(0, 32)) = 6
 
         // Debug dropdown:
         [Enum(Final,0, DiscMask,1, SurfaceNoise,2, Spots,3, Glow,4, SpinPin,5, Flares,6)]
@@ -185,30 +162,13 @@ Shader "Unlit/ProceduralStar"
                 float  _FlaresEnabled;
                 float  _FlareRingCount;
                 float  _FlareRingSeed;
-                float  _FlareRingOrbitRPS;
-                float  _FlareRingOffsetWorld;
                 float  _FlareRingMajorWorld;
                 float  _FlareRingMinorWorld;
                 float  _FlareRingWidthWorld;
-                float  _FlareRingTilt;
-                float  _FlareRingNear;
-                float  _FlareRingFar;
-                float  _FlareRingRimOverlapWorld;
                 float  _FlareRingBreakup;
-                float  _FlareRingBreakupScale;
-                float  _FlareRingFlickerSpeed;
-                float  _FlareRingFlickerAmt;
-
-                float  _FlareLifeEnabled;
-                float  _FlareLifePeriod;
-                float  _FlareLifeDuty;
-                float  _FlareLifeFadeFrac;
                 float  _FlareLifeJitter;
                 float  _FlareLifeDutyJitter;
-
                 float  _FlareIntensity;
-                float  _FlareAlpha;
-                float  _FlarePosterizeSteps;
 
                 float  _DebugMode;
                 float  _DebugPinWidth;
@@ -378,9 +338,8 @@ Shader "Unlit/ProceduralStar"
                 float2 uvF = pF / radius;
                 float2 uv  = pQ / radius;
 
-                // top->bottom factor
-                float gradT_body   = saturate(uv.y  * 0.5 + 0.5);
-                float gradT_smooth = saturate(uvF.y * 0.5 + 0.5);
+                // pole->center factor (symmetric, inverted)
+                float gradT_body   = saturate(1.0 - abs(uv.y));
 
                 float rr = dot(uv, uv);
                 float z  = sqrt(max(0.0, 1.0 - rr));
@@ -493,7 +452,7 @@ Shader "Unlit/ProceduralStar"
 
                     glow = halo * _GlowIntensity * bBoost;
 
-                    float3 glowCol = SampleRamp(gradT_smooth, 2.0);
+                    float3 glowCol = SampleRamp(gradT_body, 2.0);
                     glowRGB = glowCol * glow;
                     glowRGB += glowCol * discFull * (0.08 * _GlowIntensity) * bBoost;
                 }
@@ -509,19 +468,20 @@ Shader "Unlit/ProceduralStar"
 
                     float aBase = max(_FlareRingMajorWorld / radius, 0.0);
                     float bBase = max(_FlareRingMinorWorld / radius, 0.0);
-                    float offBase = max(_FlareRingOffsetWorld / radius, 0.0);
                     float wBase = max(_FlareRingWidthWorld / radius, 0.0);
-                    float rimOverlap = max(_FlareRingRimOverlapWorld / radius, 0.0);
+                    const float rimOverlap = 0.01 / radius; // Hardcoded rim overlap
 
                     float aaN = max(px / radius, 0.0015);
 
-                    float discR = length(uv);
-                    float outsideMask = smoothstep(1.0 - rimOverlap, 1.0 + aaN, discR);
-
-                    float orbitAng = (_FlareRingOrbitRPS * TWO_PI) * timeSec;
+                    // Flares should be visible at and near the star edge
+                    // No longer need outsideMask since flares are positioned at surface
+                    float outsideMask = 1.0;
 
                     float flareBrightBoost = max(0.0, 1.0 + 0.35 * (_Brightness - 1.0));
-                    float tilt = saturate(_FlareRingTilt);
+                    const float tilt = 0.65; // Hardcoded near/far tilt
+
+                    // Star rotation angle for flares (negate to match surface rotation direction)
+                    float rotAngle = -angle;
 
                     // brightness-noise agency for flares
                     float2 dir2 = uv;
@@ -552,72 +512,129 @@ Shader "Unlit/ProceduralStar"
                         float r2 = hash11(seed + 21.4);
                         float r3 = hash11(seed + 44.0);
 
+                        // Fixed angular position on star surface (anchor point)
                         float baseAng = (fi / max(1.0, (float)count)) * TWO_PI;
                         baseAng += (r0 - 0.5) * 0.75;
-                        float ang = baseAng + orbitAng;
 
-                        float2 dir = float2(cos(ang), sin(ang));
+                        // Calculate 3D anchor position on sphere surface
+                        float2 anchorUV = float2(cos(baseAng), sin(baseAng));
+                        float anchorZ = sqrt(max(0.0, 1.0 - dot(anchorUV, anchorUV)));
+                        float3 anchorPos = float3(anchorUV.x, anchorUV.y, anchorZ);
 
-                        float off = offBase * lerp(0.80, 1.20, r1);
-                        float a = aBase * lerp(0.80, 1.30, r2);
-                        float b = bBase * lerp(0.80, 1.20, r3);
+                        // Rotate anchor with the star
+                        float3 anchorRotated = rotateAroundAxis(anchorPos, axis, rotAngle);
 
-                        float alignedAxis = ang;
-                        float randomAxis  = (r2 - 0.5) * 1.2 + orbitAng * 0.25;
-                        float ellAng = lerp(randomAxis, alignedAxis, 0.85) + (r3 - 0.5) * 0.10;
+                        // Visibility: skip flares on far side
+                        float visibility = smoothstep(-0.1, 0.2, anchorRotated.z);
+                        if (visibility < 0.01) continue;
 
-                        float2 p = uv - dir * off;
-                        p = rot2(p, ellAng);
+                        // Calculate lifecycle
+                        const float basePeriod = 6.0;
+                        const float baseDuty = 0.55;
+                        const float fadeFrac = 0.12;
 
-                        float stroke = ellipseStroke(p, a, b, wBase * 0.5, aaN);
+                        float pJ = lerp(1.0 - _FlareLifeJitter, 1.0 + _FlareLifeJitter, hash11(seed + 101.1));
+                        float dJ = lerp(1.0 - _FlareLifeDutyJitter, 1.0 + _FlareLifeDutyJitter, hash11(seed + 202.2));
 
-                        float theta = atan2(p.y / max(b,1e-6), p.x / max(a,1e-6));
-                        float t01 = (theta + 3.14159265) / TWO_PI;
+                        float period = max(0.25, basePeriod * pJ);
+                        float duty   = clamp(baseDuty * dJ, 0.05, 0.95);
 
-                        float depth = 0.5 + 0.5 * sin(theta);
-                        float nearFar = lerp(_FlareRingFar, _FlareRingNear, lerp(0.5, depth, tilt));
+                        float phase01 = hash11(seed + 303.3);
+                        float life = pulseEnvelope01(timeSec, period, duty, fadeFrac, phase01);
 
+                        // Skip if not alive
+                        if (life < 0.01) continue;
+
+                        // Scale loop dimensions with lifecycle
+                        float sizeScale = life;
+                        float loopHeight = aBase * lerp(0.8, 1.3, r2) * sizeScale;  // Peak height of the loop
+                        float loopWidth = bBase * lerp(0.8, 1.2, r3) * sizeScale;   // Angular width of the loop
+                        float strokeWidth = wBase * sizeScale;
+
+                        // Create loop/arc in 3D:
+                        // The loop extends radially outward from the anchor, reaches a peak height,
+                        // then curves back down to the surface
+                        // We'll sample points along the loop and find the closest distance to pixel
+
+                        float minDist = 999.0;
+                        float closestT = 0.0;
+                        const int LOOP_SAMPLES = 16;
+
+                        [unroll]
+                        for (int s = 0; s < LOOP_SAMPLES; s++)
+                        {
+                            float t = (float)s / (float)(LOOP_SAMPLES - 1); // 0 to 1 along the loop
+
+                            // Loop shape: parabolic arc
+                            // t=0: at anchor point (surface)
+                            // t=0.5: at peak height
+                            // t=1: back at surface
+                            float height = loopHeight * (1.0 - 4.0 * (t - 0.5) * (t - 0.5)); // Parabola
+
+                            // Angular offset along the surface (creates the "loop" effect)
+                            float angOffset = (t - 0.5) * loopWidth;
+
+                            // Calculate 3D position on loop (before rotation)
+                            // Start from anchor, extend outward + rotate around anchor
+                            float localAng = baseAng + angOffset;
+                            float3 loopDir = normalize(float3(cos(localAng), sin(localAng), 0));
+                            float3 loopPos = loopDir * (1.0 + height);
+
+                            // Rotate the loop point with the star
+                            float3 loopRotated = rotateAroundAxis(loopPos, axis, rotAngle);
+
+                            // Project to 2D
+                            float2 loopProj = loopRotated.xy;
+
+                            // Distance from current pixel to this loop point
+                            float dist = length(uv - loopProj);
+                            if (dist < minDist)
+                            {
+                                minDist = dist;
+                                closestT = t;
+                            }
+                        }
+
+                        // Render the loop as a stroke
+                        float stroke = 1.0 - smoothstep(strokeWidth * 0.5, strokeWidth * 0.5 + aaN, minDist);
+
+                        // Breakup noise along the loop
                         if (_FlareRingBreakup > 0.001)
                         {
-                            float nB = valueNoise2D(float2(t01 * _FlareRingBreakupScale, timeSec * 0.55 + seed));
+                            const float breakupScale = 18.0;
+                            float nB = valueNoise2D(float2(closestT * breakupScale, timeSec * 0.55 + seed));
                             float breakup = lerp(1.0, lerp(0.55, 1.25, nB), _FlareRingBreakup);
                             stroke *= breakup;
                         }
 
+                        // Brightness variation along the loop (brighter at peak)
+                        float loopBrightness = lerp(0.7, 1.0, 1.0 - abs(closestT - 0.5) * 2.0);
+
+                        // Flicker
+                        const float flickerSpeed = 2.0;
+                        const float flickerAmt = 0.35;
                         float flick = 1.0;
-                        if (_FlareRingFlickerAmt > 0.001)
+                        if (flickerAmt > 0.001)
                         {
-                            float tF = timeSec * _FlareRingFlickerSpeed;
+                            float tF = timeSec * flickerSpeed;
                             float a0 = hash11(seed * 3.1 + floor(tF));
                             float a1 = hash11(seed * 3.1 + floor(tF) + 1.0);
                             float ft = frac(tF);
                             ft = ft * ft * (3.0 - 2.0 * ft);
                             float f = lerp(a0, a1, ft);
-                            flick = lerp(1.0, f, _FlareRingFlickerAmt);
+                            flick = lerp(1.0, f, flickerAmt);
                         }
 
-                        float life = 1.0;
-                        if (_FlareLifeEnabled > 0.5)
-                        {
-                            float pJ = lerp(1.0 - _FlareLifeJitter, 1.0 + _FlareLifeJitter, hash11(seed + 101.1));
-                            float dJ = lerp(1.0 - _FlareLifeDutyJitter, 1.0 + _FlareLifeDutyJitter, hash11(seed + 202.2));
-
-                            float period = max(0.25, _FlareLifePeriod * pJ);
-                            float duty   = clamp(_FlareLifeDuty * dJ, 0.05, 0.95);
-
-                            float phase01 = hash11(seed + 303.3);
-                            life = pulseEnvelope01(timeSec, period, duty, _FlareLifeFadeFrac, phase01);
-                        }
-
-                        float m = stroke * outsideMask * life;
+                        float m = stroke * life * visibility;
                         flareMask = saturate(flareMask + m);
 
-                        float flareVal = m * _FlareIntensity * nearFar * flick * flareBrightBoost * bBoost;
+                        float flareVal = m * _FlareIntensity * loopBrightness * flick * flareBrightBoost * bBoost;
                         flareVal *= flareNoiseMul;
 
-                        float fSteps = max(0.0, _FlarePosterizeSteps);
-                        if (fSteps >= 2.0)
-                            flareVal = floor(flareVal * fSteps) / fSteps;
+                        // Posterization
+                        const float posterizeSteps = 6.0;
+                        if (posterizeSteps >= 2.0)
+                            flareVal = floor(flareVal * posterizeSteps) / posterizeSteps;
 
                         flareRGB += flareCol * flareVal;
                     }
@@ -680,7 +697,7 @@ Shader "Unlit/ProceduralStar"
 
                 float alphaBody  = disc * _BodyAlpha;
                 float alphaGlow  = saturate(glow * _GlowAlpha);
-                float alphaFlare = flareMask * _FlareAlpha;
+                float alphaFlare = flareMask * 0.55; // Hardcoded flare alpha
 
                 float finalA = saturate(alphaBody + alphaGlow + alphaFlare);
                 return float4(finalRGB, finalA);
