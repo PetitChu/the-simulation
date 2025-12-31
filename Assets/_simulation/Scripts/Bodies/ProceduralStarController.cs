@@ -35,7 +35,7 @@ namespace BrainlessLabs.Simulation
 
         [Header("Cards / Debug")]
         [SerializeField] private bool recordHistory = true;
-        [SerializeField] private readonly List<StarCardHistoryEntry> history = new();
+        [SerializeField] private List<StarCardHistoryEntry> history = new();
 
         // Private config instance
         private ProceduralStarVisualConfig _cfg;
