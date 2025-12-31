@@ -515,7 +515,7 @@ Shader "Unlit/ProceduralStar"
                         float baseAng = (fi / max(1.0, (float)count)) * TWO_PI;
                         baseAng += (r0 - 0.5) * 0.75;
 
-                        // Calculate 3D position on sphere and check visibility after rotation
+                        // Calculate 3D position on sphere and rotate it
                         float2 flareUV = float2(cos(baseAng), sin(baseAng));
                         float flareZ = sqrt(max(0.0, 1.0 - dot(flareUV, flareUV)));
                         float3 flareNormal = float3(flareUV.x, flareUV.y, flareZ);
@@ -527,7 +527,8 @@ Shader "Unlit/ProceduralStar"
                         float visibility = smoothstep(-0.1, 0.2, flareRotated.z);
                         if (visibility < 0.01) continue; // Skip flares on far side
 
-                        float2 dir = float2(cos(baseAng), sin(baseAng));
+                        // Use rotated position for flare placement (project 3D to 2D)
+                        float2 dir = flareRotated.xy;
 
                         // Calculate lifecycle (always enabled)
                         const float basePeriod = 6.0;  // Hardcoded lifetime period
