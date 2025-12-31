@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace BrainlessLabs.Simulation
@@ -34,7 +35,7 @@ namespace BrainlessLabs.Simulation
 
         [Header("Cards / Debug")]
         [SerializeField] private bool recordHistory = true;
-        [SerializeField] private List<StarCardHistoryEntry> history = new();
+        [SerializeField] private readonly List<StarCardHistoryEntry> history = new();
 
         // Private config instance
         private ProceduralStarVisualConfig _cfg;
@@ -200,7 +201,8 @@ namespace BrainlessLabs.Simulation
         }
 
         /// <summary>
-        /// Replays all cards in history from default state
+        /// Replays all cards in history from default state.
+        /// Rebuilds the history with reapplied cards to maintain history consistency.
         /// </summary>
         [ContextMenu("Cards/Replay History")]
         public void ReplayHistory()
@@ -222,25 +224,11 @@ namespace BrainlessLabs.Simulation
             state = StarState.Default;
             history.Clear();
 
-            // Temporarily disable history recording during replay
-            var wasRecording = recordHistory;
-            recordHistory = false;
-
-            // Reapply all cards
-            foreach (var card in cardsToReplay)
+            // Reapply all cards with history recording enabled
+            foreach (var card in cardsToReplay.Where(c => c != null))
             {
-                if (card != null)
-                {
-                    state = ApplyDeltas(state, card);
-                    state = state.Clamped();
-                }
+                ApplyCard(card);
             }
-
-            // Restore recording state and rebuild history with final result
-            recordHistory = wasRecording;
-
-            // Rebuild visual
-            RebuildAndApply();
 
             Debug.Log($"ProceduralStarController: Replayed {cardsToReplay.Length} cards from history.", this);
         }
