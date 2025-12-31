@@ -371,7 +371,6 @@ Shader "Unlit/ProceduralStar"
 
                 float rim   = smoothstep(_RimStart, 1.0, nd);
                 float light = _Brightness * (1.0 - rim * _RimStrength);
-                light *= surfMix;
 
                 float spotsMask = 0.0;
                 if (_SpotsEnabled > 0.5)
@@ -410,7 +409,15 @@ Shader "Unlit/ProceduralStar"
 
                     float m = smoothstep(_SpotThreshold, _SpotThreshold + _SpotSoftness, sN);
                     spotsMask = (1.0 - m) * disc;
+                }
 
+                // Spots suppress surface noise to appear as smooth dark regions
+                surfMix = lerp(surfMix, 1.0, spotsMask * 0.7);
+                light *= surfMix;
+
+                // Apply spot darkening
+                if (_SpotsEnabled > 0.5)
+                {
                     light *= (1.0 - spotsMask * _SpotIntensity);
                 }
 
