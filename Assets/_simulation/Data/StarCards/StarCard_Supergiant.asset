@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: StarCard_Supergiant
   m_EditorClassIdentifier: BrainlessLabs.Simulation::BrainlessLabs.Simulation.StarCard
   title: Supergiant
-  description: 
+  description: Greatly increases star mass and radius while slightly adjusting temperature and exotic properties to create a supergiant.
   icon: {fileID: 0}
   sortOrder: 0
   deltas:
