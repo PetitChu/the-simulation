@@ -512,33 +512,26 @@ Shader "Unlit/ProceduralStar"
                         float r2 = hash11(seed + 21.4);
                         float r3 = hash11(seed + 44.0);
 
-                        // Fixed angular position on star surface
+                        // Fixed angular position on star surface (anchor point)
                         float baseAng = (fi / max(1.0, (float)count)) * TWO_PI;
                         baseAng += (r0 - 0.5) * 0.75;
 
-                        // Calculate 3D position on sphere and rotate it
-                        float2 flareUV = float2(cos(baseAng), sin(baseAng));
-                        float flareZ = sqrt(max(0.0, 1.0 - dot(flareUV, flareUV)));
-                        float3 flareNormal = float3(flareUV.x, flareUV.y, flareZ);
+                        // Calculate 3D anchor position on sphere surface
+                        float2 anchorUV = float2(cos(baseAng), sin(baseAng));
+                        float anchorZ = sqrt(max(0.0, 1.0 - dot(anchorUV, anchorUV)));
+                        float3 anchorPos = float3(anchorUV.x, anchorUV.y, anchorZ);
 
-                        // Rotate the flare position with the star
-                        float3 flareRotated = rotateAroundAxis(flareNormal, axis, rotAngle);
+                        // Rotate anchor with the star
+                        float3 anchorRotated = rotateAroundAxis(anchorPos, axis, rotAngle);
 
-                        // Visibility: flares on far side (z <= 0) are invisible
-                        float visibility = smoothstep(-0.1, 0.2, flareRotated.z);
-                        if (visibility < 0.01) continue; // Skip flares on far side
+                        // Visibility: skip flares on far side
+                        float visibility = smoothstep(-0.1, 0.2, anchorRotated.z);
+                        if (visibility < 0.01) continue;
 
-                        // Use rotated position for flare placement (project 3D to 2D)
-                        // Normalize to ensure correct positioning at surface
-                        float2 dir = normalize(flareRotated.xy + float2(1e-6, 0)); // Add epsilon to avoid zero
-
-                        // Calculate rotated angle for ellipse orientation
-                        float rotatedAng = atan2(dir.y, dir.x);
-
-                        // Calculate lifecycle (always enabled)
-                        const float basePeriod = 6.0;  // Hardcoded lifetime period
-                        const float baseDuty = 0.55;   // Hardcoded active fraction
-                        const float fadeFrac = 0.12;   // Hardcoded fade fraction
+                        // Calculate lifecycle
+                        const float basePeriod = 6.0;
+                        const float baseDuty = 0.55;
+                        const float fadeFrac = 0.12;
 
                         float pJ = lerp(1.0 - _FlareLifeJitter, 1.0 + _FlareLifeJitter, hash11(seed + 101.1));
                         float dJ = lerp(1.0 - _FlareLifeDutyJitter, 1.0 + _FlareLifeDutyJitter, hash11(seed + 202.2));
@@ -549,43 +542,75 @@ Shader "Unlit/ProceduralStar"
                         float phase01 = hash11(seed + 303.3);
                         float life = pulseEnvelope01(timeSec, period, duty, fadeFrac, phase01);
 
-                        // Scale dimensions with lifecycle (grow/shrink)
+                        // Skip if not alive
+                        if (life < 0.01) continue;
+
+                        // Scale loop dimensions with lifecycle
                         float sizeScale = life;
-                        float off = 1.0;  // Center at surface contour
-                        float a = aBase * lerp(0.80, 1.30, r2) * sizeScale;
-                        float b = bBase * lerp(0.80, 1.20, r3) * sizeScale;
-                        float w = wBase * 0.5 * sizeScale;
+                        float loopHeight = aBase * lerp(0.8, 1.3, r2) * sizeScale;  // Peak height of the loop
+                        float loopWidth = bBase * lerp(0.8, 1.2, r3) * sizeScale;   // Angular width of the loop
+                        float strokeWidth = wBase * sizeScale;
 
-                        // Ellipse orientation: align with rotated direction
-                        // The ellipse should be oriented perpendicular to the radial direction
-                        float alignedAxis = rotatedAng + 1.57079632; // +90 degrees (perpendicular to radial)
-                        float randomAxis  = (r2 - 0.5) * 1.2;
-                        float ellAng = lerp(randomAxis, alignedAxis, 0.85) + (r3 - 0.5) * 0.10;
+                        // Create loop/arc in 3D:
+                        // The loop extends radially outward from the anchor, reaches a peak height,
+                        // then curves back down to the surface
+                        // We'll sample points along the loop and find the closest distance to pixel
 
-                        float2 p = uv - dir * off;
-                        p = rot2(p, ellAng);
+                        float minDist = 999.0;
+                        float closestT = 0.0;
+                        const int LOOP_SAMPLES = 16;
 
-                        float stroke = ellipseStroke(p, a, b, w, aaN);
+                        [unroll]
+                        for (int s = 0; s < LOOP_SAMPLES; s++)
+                        {
+                            float t = (float)s / (float)(LOOP_SAMPLES - 1); // 0 to 1 along the loop
 
-                        float theta = atan2(p.y / max(b,1e-6), p.x / max(a,1e-6));
-                        float t01 = (theta + 3.14159265) / TWO_PI;
+                            // Loop shape: parabolic arc
+                            // t=0: at anchor point (surface)
+                            // t=0.5: at peak height
+                            // t=1: back at surface
+                            float height = loopHeight * (1.0 - 4.0 * (t - 0.5) * (t - 0.5)); // Parabola
 
-                        // Near/far brightness (hardcoded values)
-                        const float nearBright = 1.0;
-                        const float farBright = 0.35;
-                        float depth = 0.5 + 0.5 * sin(theta);
-                        float nearFar = lerp(farBright, nearBright, lerp(0.5, depth, tilt));
+                            // Angular offset along the surface (creates the "loop" effect)
+                            float angOffset = (t - 0.5) * loopWidth;
 
-                        // Breakup noise (hardcoded scale)
+                            // Calculate 3D position on loop (before rotation)
+                            // Start from anchor, extend outward + rotate around anchor
+                            float localAng = baseAng + angOffset;
+                            float3 loopDir = normalize(float3(cos(localAng), sin(localAng), 0));
+                            float3 loopPos = loopDir * (1.0 + height);
+
+                            // Rotate the loop point with the star
+                            float3 loopRotated = rotateAroundAxis(loopPos, axis, rotAngle);
+
+                            // Project to 2D
+                            float2 loopProj = loopRotated.xy;
+
+                            // Distance from current pixel to this loop point
+                            float dist = length(uv - loopProj);
+                            if (dist < minDist)
+                            {
+                                minDist = dist;
+                                closestT = t;
+                            }
+                        }
+
+                        // Render the loop as a stroke
+                        float stroke = 1.0 - smoothstep(strokeWidth * 0.5, strokeWidth * 0.5 + aaN, minDist);
+
+                        // Breakup noise along the loop
                         if (_FlareRingBreakup > 0.001)
                         {
                             const float breakupScale = 18.0;
-                            float nB = valueNoise2D(float2(t01 * breakupScale, timeSec * 0.55 + seed));
+                            float nB = valueNoise2D(float2(closestT * breakupScale, timeSec * 0.55 + seed));
                             float breakup = lerp(1.0, lerp(0.55, 1.25, nB), _FlareRingBreakup);
                             stroke *= breakup;
                         }
 
-                        // Flicker (hardcoded parameters)
+                        // Brightness variation along the loop (brighter at peak)
+                        float loopBrightness = lerp(0.7, 1.0, 1.0 - abs(closestT - 0.5) * 2.0);
+
+                        // Flicker
                         const float flickerSpeed = 2.0;
                         const float flickerAmt = 0.35;
                         float flick = 1.0;
@@ -600,14 +625,13 @@ Shader "Unlit/ProceduralStar"
                             flick = lerp(1.0, f, flickerAmt);
                         }
 
-                        // Life is already calculated above and used for size scaling
-                        float m = stroke * outsideMask * life * visibility;
+                        float m = stroke * life * visibility;
                         flareMask = saturate(flareMask + m);
 
-                        float flareVal = m * _FlareIntensity * nearFar * flick * flareBrightBoost * bBoost;
+                        float flareVal = m * _FlareIntensity * loopBrightness * flick * flareBrightBoost * bBoost;
                         flareVal *= flareNoiseMul;
 
-                        // Posterization (hardcoded steps)
+                        // Posterization
                         const float posterizeSteps = 6.0;
                         if (posterizeSteps >= 2.0)
                             flareVal = floor(flareVal * posterizeSteps) / posterizeSteps;
