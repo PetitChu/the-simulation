@@ -200,7 +200,6 @@ MonoBehaviour:
   flareRingCount: 4
   flareRingSeed: 99
   flareRingOrbitRPS: 0.15
-  flareRingOffsetWorld: 0.35
   flareRingMajorWorld: 0.22
   flareRingMinorWorld: 0.08
   flareRingWidthWorld: 0.025
