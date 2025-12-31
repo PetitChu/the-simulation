@@ -195,6 +195,7 @@ namespace BrainlessLabs.Simulation
             targetMaterial.SetFloat("_SpotIntensity", cfg.spotIntensity);
             targetMaterial.SetFloat("_SpotTintStrength", cfg.spotTintStrength);
             targetMaterial.SetFloat("_SpotVortexStrength", cfg.spotVortexStrength);
+            targetMaterial.SetFloat("_SpotVortexScale", cfg.spotVortexScale);
             targetMaterial.SetFloat("_SpotVortexSpeed", cfg.spotVortexSpeed);
 
             targetMaterial.SetFloat("_GlowEnabled", cfg.glowEnabled);
