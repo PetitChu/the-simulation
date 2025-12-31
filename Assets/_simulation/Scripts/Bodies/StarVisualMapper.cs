@@ -56,16 +56,17 @@ namespace BrainlessLabs.Simulation
             float flaresEnabled = (s.magneticActivity > 0.10f) ? 1f : 0f;
             float flareRingCount = Mathf.Round(Mathf.Lerp(0f, 6f, s.magneticActivity));
             float flareIntensity = Mathf.Clamp(
-                0.4f + 2.0f * s.magneticActivity + 1.2f * s.exotic,
+                0.3f + 3.5f * s.magneticActivity + 1.5f * s.exotic,
                 0f,
                 6f
             );
 
-            // Ring sizes scale with radius (small prominence-like structures)
-            // Ring centers are positioned at surface contour (offset = radius)
-            float flareRingMajorWorld = radiusWorld * 0.08f;
-            float flareRingMinorWorld = radiusWorld * 0.035f;
-            float flareRingWidthWorld = Mathf.Clamp(radiusWorld * 0.012f, 0f, 0.2f);
+            // Ring sizes scale with radius AND magnetic activity (small prominence-like structures)
+            // Higher magnetic activity = larger, more energetic flares
+            float flareSizeScale = Mathf.Lerp(0.6f, 1.8f, s.magneticActivity);
+            float flareRingMajorWorld = radiusWorld * 0.08f * flareSizeScale;
+            float flareRingMinorWorld = radiusWorld * 0.035f * flareSizeScale;
+            float flareRingWidthWorld = Mathf.Clamp(radiusWorld * 0.012f * flareSizeScale, 0f, 0.2f);
 
             // Breakup/jitter from chaos
             float flareRingBreakup = Mathf.Lerp(0.2f, 0.85f, s.chaos);
