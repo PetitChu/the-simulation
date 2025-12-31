@@ -36,7 +36,7 @@ namespace BrainlessLabs.Simulation
         // M2: Atlas rebake optimization - cache hash to avoid unnecessary rebakes
         private int _lastAtlasHash;
         private bool _hasAtlasHash;
-        private bool _atlasDirty = true;
+        private bool _atlasDirty = false;
 
         private void OnEnable()
         {
