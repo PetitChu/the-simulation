@@ -528,7 +528,11 @@ Shader "Unlit/ProceduralStar"
                         if (visibility < 0.01) continue; // Skip flares on far side
 
                         // Use rotated position for flare placement (project 3D to 2D)
-                        float2 dir = flareRotated.xy;
+                        // Normalize to ensure correct positioning at surface
+                        float2 dir = normalize(flareRotated.xy + float2(1e-6, 0)); // Add epsilon to avoid zero
+
+                        // Calculate rotated angle for ellipse orientation
+                        float rotatedAng = atan2(dir.y, dir.x);
 
                         // Calculate lifecycle (always enabled)
                         const float basePeriod = 6.0;  // Hardcoded lifetime period
@@ -551,9 +555,9 @@ Shader "Unlit/ProceduralStar"
                         float b = bBase * lerp(0.80, 1.20, r3) * sizeScale;
                         float w = wBase * 0.5 * sizeScale;
 
-                        // Ellipse orientation: align with rotation direction
+                        // Ellipse orientation: align with rotated direction
                         // The ellipse should be oriented perpendicular to the radial direction
-                        float alignedAxis = baseAng + 1.57079632; // +90 degrees (perpendicular to radial)
+                        float alignedAxis = rotatedAng + 1.57079632; // +90 degrees (perpendicular to radial)
                         float randomAxis  = (r2 - 0.5) * 1.2;
                         float ellAng = lerp(randomAxis, alignedAxis, 0.85) + (r3 - 0.5) * 0.10;
 
