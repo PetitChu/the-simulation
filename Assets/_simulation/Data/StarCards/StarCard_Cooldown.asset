@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c353a5c818ede6d469991ac52b6177ee, type: 3}
   m_Name: StarCard_Cooldown
   m_EditorClassIdentifier: BrainlessLabs.Simulation::BrainlessLabs.Simulation.StarCard
-  title: 
-  description: 
+  title: Cooldown
+  description: Reduces the star's temperature, chroma, and magnetic activity.
   icon: {fileID: 0}
   sortOrder: 0
   deltas:
