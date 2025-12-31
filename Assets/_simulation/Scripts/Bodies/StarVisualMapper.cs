@@ -40,7 +40,7 @@ namespace BrainlessLabs.Simulation
             // D) Spots - driven by magneticActivity + chaos/exotic
             float spotsEnabled = (s.magneticActivity > 0.05f) ? 1f : 0f;
             float spotThreshold = Mathf.Lerp(0.70f, 0.35f, s.magneticActivity);
-            float spotIntensity = Mathf.Lerp(0.20f, 0.65f, s.magneticActivity);
+            float spotIntensity = Mathf.Lerp(0.20f, 0.35f, s.magneticActivity);
             float spotTintStrength = Mathf.Clamp(
                 0.15f + 0.6f * s.metallicity + 0.3f * s.magneticActivity,
                 0f,
