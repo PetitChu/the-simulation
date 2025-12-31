@@ -377,6 +377,7 @@ namespace BrainlessLabs.Simulation
         private void BakeRampAtlasIfDirty(Gradient row0, Gradient row1, Gradient row2, Gradient row3, Gradient row4)
         {
             int newHash = ComputeAtlasHash(row0, row1, row2, row3, row4);
+            var desiredFormat = hdr ? GraphicsFormat.R16G16B16A16_SFloat : GraphicsFormat.R8G8B8A8_UNorm;
 
             bool needsRebake = _atlasDirty
                             || !_hasAtlasHash
@@ -384,6 +385,7 @@ namespace BrainlessLabs.Simulation
                             || _atlas == null
                             || _atlas.width != width
                             || _atlas.height != ROWS
+                            || _atlas.graphicsFormat != desiredFormat
                             || targetMaterial.GetTexture(rampTexProperty) != _atlas;
 
             if (needsRebake)
