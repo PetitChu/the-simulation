@@ -448,6 +448,10 @@ namespace BrainlessLabs.Simulation
                 int hash = 17;
                 hash = hash * 31 + (int)g.mode;
 
+                // Hash the number of keys to reduce collision probability
+                hash = hash * 31 + g.colorKeys.Length;
+                hash = hash * 31 + g.alphaKeys.Length;
+
                 // Hash color keys
                 foreach (var ck in g.colorKeys)
                 {
