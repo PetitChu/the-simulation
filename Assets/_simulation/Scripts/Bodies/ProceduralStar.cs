@@ -330,7 +330,7 @@ namespace BrainlessLabs.Simulation
 
         /// <summary>
         /// Core atlas baking logic: creates/resizes atlas and fills pixels from 5 gradients.
-        /// Does NOT apply any float parameters to material.
+        /// Applies only the ramp atlas texture and its row-count property, not the other float shader parameters (those are set by ApplyFloatsOnly).
         /// </summary>
         private void BakeRampAtlas(Gradient row0, Gradient row1, Gradient row2, Gradient row3, Gradient row4)
         {
