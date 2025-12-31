@@ -480,8 +480,8 @@ Shader "Unlit/ProceduralStar"
                     float flareBrightBoost = max(0.0, 1.0 + 0.35 * (_Brightness - 1.0));
                     const float tilt = 0.65; // Hardcoded near/far tilt
 
-                    // Star rotation angle for visibility calculation
-                    float rotAngle = (_RotationRPS * TWO_PI) * timeSec;
+                    // Star rotation angle for flares (negate to match surface rotation direction)
+                    float rotAngle = -angle;
 
                     // brightness-noise agency for flares
                     float2 dir2 = uv;
