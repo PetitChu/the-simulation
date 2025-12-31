@@ -408,9 +408,16 @@ namespace BrainlessLabs.Simulation
             }
             else
             {
-                // No rebake needed, but ensure material binding is correct
-                targetMaterial.SetTexture(rampTexProperty, _atlas);
-                targetMaterial.SetFloat(rampRowsProperty, ROWS);
+                // No rebake needed, but ensure material binding is correct without redundant updates
+                if (targetMaterial.GetTexture(rampTexProperty) != _atlas)
+                {
+                    targetMaterial.SetTexture(rampTexProperty, _atlas);
+                }
+
+                if (!Mathf.Approximately(targetMaterial.GetFloat(rampRowsProperty), ROWS))
+                {
+                    targetMaterial.SetFloat(rampRowsProperty, ROWS);
+                }
             }
         }
 
