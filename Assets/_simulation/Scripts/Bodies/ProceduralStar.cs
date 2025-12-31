@@ -184,9 +184,6 @@ namespace BrainlessLabs.Simulation
             // _SurfaceScale, _SurfaceStrength, _EvolveStrength, _EvolveX, _EvolveY
             // _SpotScale, _SpotDetailScaleMul, _SpotDetailStrength, _SpotSoftness
             // _SpotVortexScale (fixed), _GlowPower, _GlowFalloff, _GlowEdgeSoftWorld, _GlowBrightnessInfluence
-            // _FlareRingTilt, _FlareRingNear, _FlareRingFar, _FlareRingRimOverlapWorld, _FlareRingBreakupScale
-            // _FlareRingFlickerSpeed, _FlareRingFlickerAmt, _FlareLifeEnabled, _FlareLifePeriod, _FlareLifeDuty
-            // _FlareLifeFadeFrac, _FlareAlpha, _FlarePosterizeSteps
 
             targetMaterial.SetFloat("_TimeScale", cfg.timeScale);
             targetMaterial.SetFloat("_RotationRPS", cfg.rotationRPS);
