@@ -194,24 +194,34 @@ namespace BrainlessLabs.Simulation
         {
             if (force)
             {
-                MarkAtlasDirty();
-            }
-
-            // Check if gradients changed by computing hash
-            int newHash = ComputeAtlasHash(cfg.bodyLow, cfg.bodyHigh, cfg.glow, cfg.flare, cfg.spot);
-
-            if (!_hasAtlasHash || newHash != _lastAtlasHash)
-            {
-                // Gradients changed - copy them into component fields
+                // Force path: always apply gradients and force a rebake regardless of hash equality.
                 bodyLow = cfg.bodyLow;
                 bodyHigh = cfg.bodyHigh;
                 glow = cfg.glow;
                 flare = cfg.flare;
                 spot = cfg.spot;
 
+                // Ensure atlas is treated as needing a full rebake.
                 MarkAtlasDirty();
+                _hasAtlasHash = false;
             }
+            else
+            {
+                // Check if gradients changed by computing hash
+                int newHash = ComputeAtlasHash(cfg.bodyLow, cfg.bodyHigh, cfg.glow, cfg.flare, cfg.spot);
 
+                if (!_hasAtlasHash || newHash != _lastAtlasHash)
+                {
+                    // Gradients changed - copy them into component fields
+                    bodyLow = cfg.bodyLow;
+                    bodyHigh = cfg.bodyHigh;
+                    glow = cfg.glow;
+                    flare = cfg.flare;
+                    spot = cfg.spot;
+
+                    MarkAtlasDirty();
+                }
+            }
             // Bake atlas if needed (will check dirty flag + hash)
             BakeRampAtlasIfDirty(bodyLow, bodyHigh, glow, flare, spot);
         }
